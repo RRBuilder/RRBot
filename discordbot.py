@@ -58,6 +58,8 @@ async def on_command_error(ctx, error):
         await ctx.send("A parameter is missing!")
     if isinstance(error, commands.CommandOnCooldown):
         await ctx.send("Command is on cooldown!")
+    if isinstance(error, discord.ext.commands.errors.MissingPermissions):
+        await ctx.send("Sorry about that, you do not have the required permissions to run this!")
     else:
         await ctx.send("Some error happened, printed in console.")
         print(error)
@@ -110,17 +112,20 @@ async def on_guild_join(guild):
 async def on_message(message):
     location = 0
     Allowed = False
-    for x in range(len(Config["guilds"])):
-        if int(Config["guilds"][x]["guildID"]) == int(message.guild.id):
-            location = x
-    if Config["guilds"][location]["chat"] == "all":
-        Allowed = True
-    elif Config["guilds"][location]["chat"] == str(message.channel.id):
-        Allowed = True
+    if isinstance(message.channel, discord.DMChannel):
+        pass
     else:
-        return
-    if Allowed == True:
-        await bot.process_commands(message)
+        for x in range(len(Config["guilds"])):
+            if int(Config["guilds"][x]["guildID"]) == int(message.guild.id):
+                location = x
+        if Config["guilds"][location]["chat"] == "all":
+            Allowed = True
+        elif Config["guilds"][location]["chat"] == str(message.channel.id):
+            Allowed = True
+        else:
+            return
+        if Allowed == True:
+            await bot.process_commands(message)
         if message.author != bot.user:
             prefix = get_prefix(bot, message)
         if bot.user.mentioned_in(message):
@@ -168,7 +173,7 @@ async def Comp(ctx, username):
     if success == False:
         await ctx.send("Sorry, but that username is not valid! Make sure you re-enter it")
     else:
-        Version, LastLoginRead, LastLogoutRead, UserLang, LastGame, Length, UsernameRead, API_Status = SessionAPI(uuid)
+        Version, LastLoginRead, LastLogoutRead, UserLang, LastGame, Length, UsernameRead, API_Status, When = SessionAPI(uuid)
         Games, Maps, TimesStarted, TimesEnded, Lens, API_Status = GamesAPI(uuid)
         if API_Status == False:
             await ctx.send("The API appears to be down.")
@@ -177,7 +182,7 @@ async def Comp(ctx, username):
                 await ctx.send("This username returns a mainly empty file. This is likely one of those usernames that would return no name on plancke and is a general pain to work with. So it is skipped.")
             else:
                 embed = discord.Embed(title="Last session.", color=0x33ffff)
-                text = "```\nUUID: "+uuid+"```"+"```\nVersion: "+Version+"```"+"```\nLast Login: "+str(LastLoginRead)+"```"+"```\nLast Logout: "+str(LastLogoutRead)+"```"+"```\nLanguage: "+UserLang+"```"+"```\nLast game type: "+LastGame+"```"+"```\nSession length: "+str(Length)+"```"
+                text = "```\nUUID: "+uuid+"```"+"```\nVersion: "+Version+"```"+"```\nLast Login: "+str(LastLoginRead)+"```"+"```\nLast Logout: "+str(LastLogoutRead)+"```"+"```\nLanguage: "+UserLang+"```"+"```\nLast game type: "+LastGame+"```"+"```\nSession length: "+str(Length)+"```"+"\nThe above happened <t:"+str(When)+":R>"
                 embed.add_field(name="Here is the last player session for ```"+UsernameRead+"```", value=text)
                 await ctx.send(embed=embed)
                 if len(Games) == 0:
