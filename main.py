@@ -23,6 +23,10 @@ def timed_lru_cache(seconds: int, maxsize: int = 128):
 
     return wrapper_cache
 
+def TimeSnip(timewhen):
+    timewhen = int(str(timewhen)[0:-3])
+    return timewhen
+
 @lru_cache(maxsize = 250)
 def UUIDFetch(username):
     uuid = ""
@@ -43,7 +47,7 @@ def DateDisplay(timevar):
     if timevar == 0:
         DateData = "Player online or data not found."
     else:
-        DateData = datetime.fromtimestamp(timevar/1000.0)
+        DateData = datetime.fromtimestamp(int(timevar/1000))
     return DateData
 
 def LengthProcess(Start, End):
