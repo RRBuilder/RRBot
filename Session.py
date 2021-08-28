@@ -1,6 +1,7 @@
 import requests
 from main import timed_lru_cache, DateDisplay, LengthProcess, GameReadable, TimeSnip
 from decouple import config
+import time
 
 key = config("API_TOKEN")
 
@@ -50,9 +51,13 @@ def StatsRequest(UUID):
 @timed_lru_cache(600)
 def MainProcess(UUID):
     Version, LastLogin, LastLogout, UserLang, LastGame, Username, API_Status = StatsRequest(UUID)
-    When = TimeSnip(LastLogout)
     LastLoginRead = DateDisplay(LastLogin)
     LastLogoutRead = DateDisplay(LastLogout)
+    if LastLogout < 0 or LastLogout == 0:
+        LastLogout = time.time()
+        When = str(LastLogout)[0:-8]
+    else:
+        When = TimeSnip(LastLogout)
     Length = LengthProcess(LastLogin, LastLogout)
     LastGame = GameReadable(LastGame)
     return Version, LastLoginRead, LastLogoutRead, UserLang, LastGame, Length, Username, API_Status, When
