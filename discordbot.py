@@ -56,13 +56,13 @@ bot.remove_command('help')
 async def on_command_error(ctx, error):
     if isinstance(error, discord.ext.commands.errors.MissingRequiredArgument):
         await ctx.send("A parameter is missing!")
-    if isinstance(error, commands.CommandOnCooldown):
+    elif isinstance(error, commands.CommandOnCooldown):
         await ctx.send("Command is on cooldown!")
-    if isinstance(error, discord.ext.commands.errors.MissingPermissions):
+    elif isinstance(error, discord.ext.commands.errors.MissingPermissions):
         await ctx.send("Sorry about that, you do not have the required permissions to run this!")
     else:
         await ctx.send("Some error happened, printed in console.")
-        print(error)
+        raise error
 
 #Notifies when the bot connects
 @bot.event
@@ -124,12 +124,12 @@ async def on_message(message):
             Allowed = True
         else:
             return
-        if Allowed == True:
-            await bot.process_commands(message)
         if message.author != bot.user:
             prefix = get_prefix(bot, message)
-        if bot.user.mentioned_in(message):
-            await message.channel.send("Hello there! My prefix is "+prefix+" if you have anymore issues. Run: "+prefix+"Help")
+            if Allowed == True:
+                await bot.process_commands(message)
+            if bot.user.mentioned_in(message):
+                await message.channel.send("Hello there! My prefix is "+prefix+" if you have anymore issues. Run: "+prefix+"Help")
 
 
 @bot.command(name='Pass', aliases=["pass", "password", "generate"])
