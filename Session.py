@@ -58,6 +58,9 @@ def MainProcess(UUID):
         When = str(LastLogout)[0:-8]
     else:
         When = TimeSnip(LastLogout)
-    Length = LengthProcess(LastLogin, LastLogout)
+    if LastLogin == 0:
+        Length = "Player online/Game ongoing."
+    else:
+        Length = LengthProcess(LastLogin, LastLogout)
     LastGame = GameReadable(LastGame)
     return Version, LastLoginRead, LastLogoutRead, UserLang, LastGame, Length, Username, API_Status, When
