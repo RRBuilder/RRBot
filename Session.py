@@ -11,6 +11,13 @@ def StatsRequest(UUID):
         Stats = requests.get("https://api.hypixel.net/player?key="+key+"&uuid="+UUID).json()
     except:
         API_Status = False
+        print("Something went wrong talking to the session API!")
+
+    r = requests.head("https://api.hypixel.net/player?key="+key+"&uuid="+UUID)
+    if r.status_code != 200:
+        print("The API did not respond with a 200 status code, it gave a "+str(r.status_code))
+    else:
+        pass
 
     try:
         Version = Stats["player"]["mcVersionRp"]
@@ -44,7 +51,6 @@ def StatsRequest(UUID):
         Username = Stats["player"]["displayname"]
     except:
         Username = "Unknown"
-
 
     return Version, LastLogin, LastLogout, UserLang, LastGame, Username, API_Status
 
