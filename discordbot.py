@@ -174,8 +174,8 @@ async def Comp(ctx, username):
         await ctx.send("Sorry, but that username is not valid! Make sure you re-enter it")
     else:
         Version, LastLoginRead, LastLogoutRead, UserLang, LastGame, Length, UsernameRead, API_Status, When = SessionAPI(uuid)
-        Games, Maps, TimesStarted, TimesEnded, Lens, API_Status = GamesAPI(uuid)
-        if API_Status == False:
+        Games, Maps, TimesStarted, TimesEnded, Lens, API_Status2 = GamesAPI(uuid)
+        if API_Status == False or API_Status2 == False:
             await ctx.send("The API appears to be down.")
         else:
             if UsernameRead == "Unknown":
@@ -215,10 +215,10 @@ async def Prefix(ctx, prefix):
 @commands.has_permissions(administrator=True)
 @commands.cooldown(1, 60, commands.BucketType.guild)
 async def Setchat(ctx, option):
-    location = get_loc(ctx.guild.id)
     if option != "all" and option != "this":
         await ctx.send("Hey! Please use either ``all`` or ``this`` for this command :)")
     elif option == "all":
+        location = get_loc(ctx.guild.id)
         if Config["guilds"][location]["chat"] == "all":
             await ctx.send("Your bot chat is already set to respond in all channels :)")
         else:
@@ -226,7 +226,8 @@ async def Setchat(ctx, option):
             Config["guilds"][location]["chat"] = "all"
             with open("config.json", "w") as configFile:
                 json.dump(Config, configFile)
-    elif option == "this":
+    else:
+        location = get_loc(ctx.guild.id)
         ChannelID = str(ctx.channel.id)
         if Config["guilds"][location]["chat"] == ChannelID:
             await ctx.send("Your bot chat is already set to this channel :)")
