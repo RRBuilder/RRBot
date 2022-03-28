@@ -225,7 +225,7 @@ async def Help(ctx):
     embed.add_field(name="How to use the bot:", value="This bot has a simple function. It is to return last session data from the hypixel API. In order to use the bot you need to use the CMP/Comp command. The usage for this bot is as follows: "+prefix+"CMP Username")
     embed.add_field(name="What is this bot for?", value="This bot will help you find out if someones account got hacked by comparing their last session data to the APIs. If they, for example, say they played Bedwars last yet they played Skywars you will be able to know!")
     embed.add_field(name="Who made this bot?", value="RRBuilder#5922 is the developer for this project. Contact them if you have any issues.")
-    await ctx.send(embed=embed)
+    await ctx.send(embed = embed)
 
 # "Compromised" command. Main function of the bot. Passes in the username and returns last session and recent games.
 
@@ -239,7 +239,7 @@ async def Comp(ctx, username):
     if success == False:
         embed = discord.Embed(color=0xff0000) #Red
         embed.add_field(name="Error",value="Sorry, but that username is not valid! Make sure you re-enter it")
-        await ctx.send(embed=embed)
+        await ctx.send(embed = embed)
     else:
         Version, LastLoginRead, LastLogoutRead, UserLang, LastGame, Length, UsernameRead, API_Status, When = SessionAPI(uuid)
         Games, Maps, TimesStarted, TimesEnded, Lens, API_Status2 = GamesAPI(uuid)
@@ -258,7 +258,7 @@ async def Comp(ctx, username):
                 if len(Games) == 0:
                     embed = discord.Embed(color=0xffeb2a) #yellow
                     embed.add_field(name="Alert!",value="No games were detected for the username entered! They likely haven't played any games recently. :)")
-                    await ctx.send(embed=embed)
+                    await ctx.send(embed = embed)
                 else:
                     embed = discord.Embed(title="Recent games.", color=0x33ffff) #Aqua
                     for x in range(len(Games)):
@@ -324,12 +324,12 @@ async def passtoggle(ctx):
         Setting = False
         embed = discord.Embed(color=0xff0000) #Red
         embed.add_field(name="Password generator",value="Disabled!")
-        await ctx.send(embed=embed)
+        await ctx.send(embed = embed)
     elif Config["guilds"][location]["pass-command"] == False:
         Setting = True
         embed = discord.Embed(color=0x80c904) #Green
         embed.add_field(name="Password generator",value="Enabled!")
-        await ctx.send(embed=embed)
+        await ctx.send(embed = embed)
     else:
         await ctx.send("Well, something broke so we enabled the passcommand just in case")
         Setting = True
@@ -349,7 +349,7 @@ async def mostcoins(ctx, username):
     if success == False:
         embed = discord.Embed(color=0xff0000) #Red
         embed.add_field(name="Error",value="Sorry, but that username is not valid! Make sure you re-enter it")
-        await ctx.send(embed=embed)
+        await ctx.send(embed = embed)
     else:
         MostCoins, MostCoinsGame, UsernameRead, API_Status = GetMostCoins(uuid)
         if API_Status == False:
@@ -363,6 +363,6 @@ async def mostcoins(ctx, username):
                 text = "**Game:** ```"+str(MostCoinsGame)+"```\n**Amount:** ```"+str(MostCoins)+"```"
                 embed = discord.Embed(color=0x80c904) #green
                 embed.add_field(name="Most coins for "+UsernameRead,value=text)
-                await ctx.send(embed=embed)
+                await ctx.send(embed = embed)
 
 bot.run(TOKEN)
