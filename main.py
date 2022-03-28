@@ -2,6 +2,7 @@ import requests
 from functools import lru_cache, wraps
 from datetime import datetime, timedelta
 
+# Tiems LRU cache wrapped function.
 def timed_lru_cache(seconds: int, maxsize: int = 128):
 
     def wrapper_cache(func):
@@ -22,11 +23,14 @@ def timed_lru_cache(seconds: int, maxsize: int = 128):
         return wrapped_func
 
     return wrapper_cache
+    #Taken from stack overflow. 
 
+# Function to get rid of miliseconds
 def TimeSnip(timewhen):
     timewhen = int(str(timewhen)[0:-3])
     return timewhen
 
+# Function to fetch the UUID of the passed through user.
 @lru_cache(maxsize = 250)
 def UUIDFetch(username):
     uuid = ""
@@ -43,6 +47,7 @@ def UUIDFetch(username):
         success = True
     return uuid, success
 
+# Generates a date.
 def DateDisplay(timevar):
     if timevar == 0:
         DateData = "Player online or data not found."
@@ -50,6 +55,7 @@ def DateDisplay(timevar):
         DateData = datetime.fromtimestamp(int(timevar/1000))
     return DateData
 
+# Converts two milisecond values to lenght between the two in a readable format.
 def LengthProcess(Start, End):
     Length = End - Start
     if Length < 0 or Length == 0:
@@ -72,6 +78,7 @@ def LengthProcess(Start, End):
             TimeData = "%dh:%dm:%ds" % (Hours, Minutes, Seconds)
     return TimeData
 
+# Converts games from the API to more readable forms.
 def GameReadable(gameType):
     game = ""
     if gameType == "BEDWARS":
@@ -132,7 +139,7 @@ def GameReadable(gameType):
         game = "Megawalls"
         pass
     elif gameType == "ARENA":
-        game = "Arena"
+        game = "Arena Brawl"
         pass
     elif gameType == "ARCADE":
         game = "Aracade"
@@ -150,11 +157,12 @@ def GameReadable(gameType):
         game = "Paintball"
         pass
     elif gameType == "WALLS":
-        game = "The walls"
+        game = "The Walls"
         pass
     elif gameType == "QUAKECRAFT":
         game = "Quake"
         pass
+    #Legacy games. - Will likely be removed soon.
     elif gameType == "SKYCLASH":
         game = "Skyclash"
         pass
