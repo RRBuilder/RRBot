@@ -274,7 +274,7 @@ async def Comp(ctx, username):
 
 @bot.command(name="Prefix", aliases=["prefix"])
 @commands.has_permissions(administrator=True)
-@commands.cooldown(1, 60, commands.BucketType.guild)
+@commands.cooldown(1, 50, commands.BucketType.guild)
 async def Prefix(ctx, prefix):
     location = get_loc(ctx.guild.id)
     if prefix == Config["guilds"][location]["prefix"]:
