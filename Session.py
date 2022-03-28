@@ -5,9 +5,11 @@ import time
 
 key = config("API_TOKEN")
 
+# Fucntion to request the stats of a player.
 def StatsRequest(UUID):
     API_Status = True
     try:
+        #fetches the player stats of a player.
         Stats = requests.get("https://api.hypixel.net/player?key="+key+"&uuid="+UUID).json()
     except:
         API_Status = False
@@ -54,6 +56,7 @@ def StatsRequest(UUID):
 
     return Version, LastLogin, LastLogout, UserLang, LastGame, Username, API_Status
 
+#Main function used to process the player data
 @timed_lru_cache(600)
 def MainProcess(UUID):
     Version, LastLogin, LastLogout, UserLang, LastGame, Username, API_Status = StatsRequest(UUID)
