@@ -12,6 +12,7 @@ def GameRequest(UUID):
     game = []
     API_Status = True
     try:
+        # Fetches recent game data from the Hypixel API.
         game = requests.get("https://api.hypixel.net/recentgames?key="+key+"&uuid="+UUID).json()
     except:
         print("Something went wrong fetching the recent games!")
@@ -19,6 +20,7 @@ def GameRequest(UUID):
         return GameType, Map, TimeEnded, TimeStarted, API_Status
 
     r = requests.head("https://api.hypixel.net/recentgames?key="+key+"&uuid="+UUID)
+    # Status code check to prevent errors pertaining to not reciving data.
     if r.status_code != 200:
         print("The recent games API did not return a status code of 200, it returned "+str(r.status_code))
         try:
@@ -66,6 +68,7 @@ def GameProcess(game):
 
     return GameType, Map, TimeEnded, TimeStarted
 
+# main gmaeslist function. Returns player data
 @timed_lru_cache(600)
 def GamesList(uuid):
     timeStartedRead = []
