@@ -1,9 +1,10 @@
 from random import randrange
 
+# Password generator function
 def PassProcess(Count, UniCode):
   List = []
   Pass = ""
-  if UniCode == "1" or UniCode == "yes" or UniCode == "Yes":
+  if UniCode == "1":
     for x in range(Count-10):
       Char = randrange(31,55296)
       List.append(Char)
