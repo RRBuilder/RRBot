@@ -16,6 +16,7 @@ User tools:
 $Help - displays the help message
 $CMP - displays the last session and 5 most recent games played.
 $Pass {length} {1 or 2} - generates a password, messages the user and deletes the message 30 seconds later. 1 for Unicode, 0 for ASCII.
+$Mostcoins - displays users highest coins and gamemode with highest coins
 
 
 
