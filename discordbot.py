@@ -57,7 +57,7 @@ def get_pass(bot, ctx):
     if Set == False:
         return True
 
-# Function to find the matching location of a set guildID within the config.json file.
+# Function to find the matching location of a set guildID within the config.json file
 
 
 def get_loc(guildid):
