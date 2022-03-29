@@ -33,18 +33,17 @@ def TimeSnip(timewhen):
 # Function to fetch the UUID of the passed through user.
 @lru_cache(maxsize = 250)
 def UUIDFetch(username):
-    uuid = ""
+    success = True
+    try:
+        uuid = requests.get("https://api.mojang.com/users/profiles/minecraft/"+username).json()['id']
+    except:
+        uuid = ""
+        success = False
 
-    uuidurl = f'https://api.mojang.com/users/profiles/minecraft/{username}?'
-
-    uuidget = requests.get(uuidurl)
-
-    r = requests.head(uuidurl)
+    r = requests.head("https://api.mojang.com/users/profiles/minecraft/"+username)
     if r.status_code != 200:
         success = False
-    else:
-        uuid = uuidget.json()['id']
-        success = True
+
     return uuid, success
 
 # Generates a date.
