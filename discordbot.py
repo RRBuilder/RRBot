@@ -219,7 +219,7 @@ async def Pass(ctx, PassLen, PassUni):
         else:
             if PassUni == "1" or PassUni == "0":
                 Pass = PassGen.PassProcess(int(PassLen), PassUni)
-                #Checks if the password uses unicode or not
+                #Checks if the password uses unicode or not and sets a string variable to append to response embed.
                 if PassUni == "1":
                     UnicodeYesNo = "does"
                 else:
