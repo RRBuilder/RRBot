@@ -18,8 +18,7 @@ def StatsRequest(UUID):
     r = requests.head("https://api.hypixel.net/player?key="+key+"&uuid="+UUID)
     if r.status_code != 200:
         print("The API did not respond with a 200 status code, it gave a "+str(r.status_code))
-    else:
-        pass
+        API_Status = False
 
     try:
         Version = Stats["player"]["mcVersionRp"]
