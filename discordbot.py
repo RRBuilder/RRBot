@@ -13,6 +13,13 @@ from Coins import GetMostCoins
 load_dotenv()
 TOKEN = config("DISCORD_TOKEN")
 
+# Setting colour variables
+
+Aqua = 0x33ffff
+Red = 0xff0000
+Yellow = 0xffeb2a
+Green = 0x80c904
+
 # Imports config. Guild settings stored inside a .json file.
 
 
@@ -70,40 +77,40 @@ bot.remove_command('help')
 @bot.event
 async def on_command_error(ctx, error):
     if isinstance(error, discord.ext.commands.errors.MissingRequiredArgument):
-        embed = discord.Embed(color = 0xff0000) #Red
+        embed = discord.Embed(color = Red) #Red
         embed.add_field(name = "Error", value = "A parameter is missing!")
         await ctx.send(embed = embed)
     elif isinstance(error, commands.CommandOnCooldown):
-        embed = discord.Embed(color = 0xff0000) #Red
+        embed = discord.Embed(color = Red) #Red
         embed.add_field(name = "Error", value = "Command is on cooldown!")
         await ctx.send(embed = embed)
     elif isinstance(error, discord.ext.commands.errors.MissingPermissions):
-        embed = discord.Embed(color = 0xff0000) #Red
+        embed = discord.Embed(color = Red) #Red
         embed.add_field(name = "Error", value = "Sorry about that, you do not have the required permissions to run this!")
         await ctx.send(embed = embed)
     elif isinstance(error, discord.ext.commands.errors.CommandInvokeError):
         if str(error) == "Command raised an exception: Exception: Password too small":
-            embed = discord.Embed(color = 0xff0000) #Red
+            embed = discord.Embed(color = Red) #Red
             embed.add_field(name = "Error", value = "That password is too small! Please ensure you enter a lenght of at least 12!")
             await ctx.send(embed = embed)
 
         elif str(error) == "Command raised an exception: Exception: Password too big":
-            embed = discord.Embed(color = 0xff0000) #Red
+            embed = discord.Embed(color = Red) #Red
             embed.add_field(name = "Error", value = "That password is too long! Please ensure you enter a lenght that is smaller than 256!")
             await ctx.send(embed = embed)
 
         elif str(error) == "Command raised an exception: Exception: PassUni Invalid":
-            embed = discord.Embed(color = 0xff0000) #Red
+            embed = discord.Embed(color = Red) #Red
             embed.add_field(name = "Error", value = "Please enter either 0 for ASCII or 1 for Unicode")
             await ctx.send(embed = embed)
 
         elif str(error) == "Command raised an exception: Exception: Username too long":
-            embed = discord.Embed(color = 0xff0000) #Red
+            embed = discord.Embed(color = Red) #Red
             embed.add_field(name = "Error", value = "Please enter a username with a maximum lenght of 16.")
             await ctx.send(embed = embed)
 
         elif str(error) == "Command raised an exception: Forbidden: 403 Forbidden (error code: 50007): Cannot send messages to this user":
-            embed = discord.Embed(color = 0xff0000) #Red
+            embed = discord.Embed(color = Red) #Red
             embed.add_field(name = "Error", value = "Cannot send messages to this user!")
             await ctx.send(embed = embed)
 
@@ -117,14 +124,14 @@ async def on_command_error(ctx, error):
 # Tells the user the username they entered resolves to incomplete data.
 
 async def UsernameInvalid(ctx):
-    embed = discord.Embed(color = 0xffeb2a) #yellow
-    embed.add_field(name = "Alert!",value = "This username returns a mainly empty file. This is likely one of those usernames that would return no name on plancke and is a general pain to work with. So it is skipped.")
+    embed = discord.Embed(color = Yellow) #yellow
+    embed.add_field(name = "Alert!", value = "This username returns a mainly empty file. This is likely one of those usernames that would return no name on plancke and is a general pain to work with. So it is skipped.")
     await ctx.send(embed = embed)
 
 # Sends an embed informing user the username they entered didnt resolve to a UUID
 
 async def UsernameError(ctx):
-    embed = discord.Embed(color = 0xff0000) #Red
+    embed = discord.Embed(color = Red) #Red
     embed.add_field(name = "Error", value = "Sorry, but that username is not valid! Make sure you re-enter it")
     await ctx.send(embed = embed)
 
@@ -201,7 +208,7 @@ async def on_message(message):
 async def Pass(ctx, PassLen, PassUni):
     PassComm = get_pass(bot, ctx)
     if PassComm == "False":
-        embed = discord.Embed(color = 0xff0000) #Red
+        embed = discord.Embed(color = Red) #Red
         embed.add_field(name = "Error", value = "This command is disabled, please change your config or contact the server admin.")
         await ctx.send(embed = embed)
     else:
@@ -218,7 +225,7 @@ async def Pass(ctx, PassLen, PassUni):
                 else:
                     UnicodeYesNo = "does not"
                 channel = await ctx.message.author.create_dm()
-                embed = discord.Embed(title = "Password", color = 0x33ffff) #Aqua
+                embed = discord.Embed(title = "Password", color = Aqua) #Aqua
                 embed.add_field(name = "Here is your generated password:", value = Pass)
                 embed.set_footer(text = "Made by RRBuilder#5922. This password is "+PassLen+" characters long and "+UnicodeYesNo+" include unicode. This message will auto delete in 60 seconds :)")
                 await channel.send(embed = embed, delete_after = 60)
@@ -231,7 +238,7 @@ async def Pass(ctx, PassLen, PassUni):
 @bot.command(name = "help", aliases = ["h", "Help", "Useage"])
 async def Help(ctx):
     prefix = get_prefix(bot, ctx)
-    embed = discord.Embed(title = "Help", color = 0x33ffff) #Aqua
+    embed = discord.Embed(title = "Help", color = Aqua) #Aqua
     embed.add_field(name = "How to use the bot:", value = "This bot has a simple function. It is to return last session data from the hypixel API. In order to use the bot you need to use the CMP/Comp command. The usage for this bot is as follows: "+prefix+"CMP Username")
     embed.add_field(name = "What is this bot for?", value = "This bot will help you find out if someones account got hacked by comparing their last session data to the APIs. If they, for example, say they played Bedwars last yet they played Skywars you will be able to know!")
     embed.add_field(name = "Who made this bot?", value = "RRBuilder#5922 is the developer for this project. Contact them if you have any issues.")
@@ -243,7 +250,7 @@ async def Help(ctx):
 @commands.cooldown(1, 10, commands.BucketType.user)
 async def Comp(ctx, username):
     if len(username) > 16 or len(username) <= 0:
-        raise Exception ("Username too long")
+        raise Exception("Username too long")
     uuid, success = UUIDFetch(username)
     if success == False:
         await UsernameError(ctx)
@@ -257,16 +264,16 @@ async def Comp(ctx, username):
             if UsernameRead == "Unknown":
                 await UsernameInvalid(ctx)
             else:
-                embed = discord.Embed(title = "Last session.", color = 0x33ffff) #Aqua
+                embed = discord.Embed(title = "Last session.", color = Aqua) #Aqua
                 text = "```\nUUID: "+uuid+"```"+"```\nVersion: "+Version+"```"+"```\nLast Login: "+str(LastLoginRead)+"```"+"```\nLast Logout: "+str(LastLogoutRead)+"```"+"```\nLanguage: "+UserLang+"```"+"```\nLast game type: "+LastGame+"```"+"```\nSession length: "+str(Length)+"```"+"\nThe above happened <t:"+str(When)+":R>"
                 embed.add_field(name = "Here is the last player session for ```"+UsernameRead+"```", value = text)
                 await ctx.send(embed = embed)
                 if len(Games) == 0:
-                    embed = discord.Embed(color = 0xffeb2a) #yellow
+                    embed = discord.Embed(color = Yellow) #yellow
                     embed.add_field(name = "Alert!", value = "No games were detected for the username entered! They likely haven't played any games recently. :)")
                     await ctx.send(embed = embed)
                 else:
-                    embed = discord.Embed(title = "Recent games.", color = 0x33ffff) #Aqua
+                    embed = discord.Embed(title = "Recent games.", color = Aqua) #Aqua
                     for x in range(len(Games)):
                         count = x+1
                         if len(Games) < count:
@@ -326,12 +333,12 @@ async def passtoggle(ctx):
     location = get_loc(ctx.guild.id)
     if Config["guilds"][location]["pass-command"] == True:
         Setting = False
-        embed = discord.Embed(color = 0xff0000) #Red
+        embed = discord.Embed(color = Red) #Red
         embed.add_field(name = "Password generator",value = "Disabled!")
         await ctx.send(embed = embed)
     elif Config["guilds"][location]["pass-command"] == False:
         Setting = True
-        embed = discord.Embed(color = 0x80c904) #Green
+        embed = discord.Embed(color = Green) #Green
         embed.add_field(name = "Password generator",value = "Enabled!")
         await ctx.send(embed = embed)
     else:
@@ -362,7 +369,7 @@ async def mostcoins(ctx, username):
                 await UsernameInvalid(ctx)
             else:
                 text = "**Game:** ```"+str(MostCoinsGame)+"```\n**Amount:** ```"+str(MostCoins)+"```"
-                embed = discord.Embed(color = 0x80c904) #green
+                embed = discord.Embed(color = Green) #green
                 embed.add_field(name = "Most coins for "+UsernameRead, value = text)
                 await ctx.send(embed = embed)
 
