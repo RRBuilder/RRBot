@@ -109,6 +109,20 @@ async def on_command_error(ctx, error):
         await ctx.send("Some error happened, printed in console.")
         raise error
 
+# Tells the user the username they entered resolves to incomplete data.
+
+async def UsernameInvalid(ctx):
+    embed = discord.Embed(color = 0xffeb2a) #yellow
+    embed.add_field(name = "Alert!",value = "This username returns a mainly empty file. This is likely one of those usernames that would return no name on plancke and is a general pain to work with. So it is skipped.")
+    await ctx.send(embed = embed)
+
+# Sends an embed informing user the username they entered didnt resolve to a UUID
+
+async def UsernameError(ctx):
+    embed = discord.Embed(color = 0xff0000) #Red
+    embed.add_field(name = "Error", value = "Sorry, but that username is not valid! Make sure you re-enter it")
+    await ctx.send(embed = embed)
+
 # This is ran when the bot is ready. This function allows me to catch errors in the config file, more notably it missing any guilds inside as it is possible someone can add the bot to their guild while its offline, and then the on_guild_join will not run.
 
 @bot.event
@@ -227,19 +241,16 @@ async def Comp(ctx, username):
         raise Exception ("Username too long")
     uuid, success = UUIDFetch(username)
     if success == False:
-        embed = discord.Embed(color = 0xff0000) #Red
-        embed.add_field(name = "Error", value = "Sorry, but that username is not valid! Make sure you re-enter it")
-        await ctx.send(embed = embed)
+        await UsernameError(ctx)
     else:
         Version, LastLoginRead, LastLogoutRead, UserLang, LastGame, Length, UsernameRead, API_Status, When = SessionAPI(uuid)
         Games, Maps, TimesStarted, TimesEnded, Lens, API_Status2 = GamesAPI(uuid)
+
         if API_Status == False or API_Status2 == False:
             await ctx.send("The API appears to be down.")
         else:
             if UsernameRead == "Unknown":
-                embed = discord.Embed(color = 0xffeb2a) #yellow
-                embed.add_field(name = "Alert!", value = "This username returns a mainly empty file. This is likely one of those usernames that would return no name on plancke and is a general pain to work with. So it is skipped.")
-                await ctx.send(embed = embed)
+                await UsernameInvalid(ctx)
             else:
                 embed = discord.Embed(title = "Last session.", color = 0x33ffff) #Aqua
                 text = "```\nUUID: "+uuid+"```"+"```\nVersion: "+Version+"```"+"```\nLast Login: "+str(LastLoginRead)+"```"+"```\nLast Logout: "+str(LastLogoutRead)+"```"+"```\nLanguage: "+UserLang+"```"+"```\nLast game type: "+LastGame+"```"+"```\nSession length: "+str(Length)+"```"+"\nThe above happened <t:"+str(When)+":R>"
@@ -335,18 +346,15 @@ async def mostcoins(ctx, username):
     uuid, success = UUIDFetch(username)
 
     if success == False:
-        embed = discord.Embed(color = 0xff0000) #Red
-        embed.add_field(name = "Error",value = "Sorry, but that username is not valid! Make sure you re-enter it")
-        await ctx.send(embed = embed)
+        await UsernameError(ctx)
     else:
         MostCoins, MostCoinsGame, UsernameRead, API_Status = GetMostCoins(uuid)
+
         if API_Status == False:
             await ctx.send("The API appears to be down.")
         else:
             if UsernameRead == "Unknown":
-                embed = discord.Embed(color = 0xffeb2a) #yellow
-                embed.add_field(name = "Alert!",value = "This username returns a mainly empty file. This is likely one of those usernames that would return no name on plancke and is a general pain to work with. So it is skipped.")
-                await ctx.send(embed = embed)
+                await UsernameInvalid(ctx)
             else:
                 text = "**Game:** ```"+str(MostCoinsGame)+"```\n**Amount:** ```"+str(MostCoins)+"```"
                 embed = discord.Embed(color = 0x80c904) #green

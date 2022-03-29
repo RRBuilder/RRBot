@@ -17,6 +17,7 @@ def StatProcess(UUID):
 
     r = requests.head("https://api.hypixel.net/player?key="+key+"&uuid="+UUID)
     if r.status_code != 200:
+        API_Status = False
         print("The API did not respond with a 200 status code, it gave a "+str(r.status_code))
 
     try:
