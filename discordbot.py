@@ -50,7 +50,6 @@ def get_pass(bot, ctx):
 # Function to find the matching location of a set guildID within the config.json file.
 
 def get_loc(guildid):
-    location = 0
     for y in range(len(Config["guilds"])):
         if Config["guilds"][y]["guildID"] == str(guildid):
             location = y
@@ -117,13 +116,12 @@ async def on_ready():
     guildIDs = []
     for guild in bot.guilds:
         guildIDs.append(guild.id)
-    z = len(guildIDs)
-    print("The bot connected to",z,"guild(s).")
+    print("The bot connected to",len(guildIDs),"guild(s).")
     LocationZ = []
     LocationY = []
     IDFoundList = []
     IDLocations = []
-    for z in range(z):
+    for z in range(len(guildIDs)):
         for y in range(len(Config["guilds"])):
             if int(guildIDs[z]) == int(Config["guilds"][y]["guildID"]) and (y not in LocationY or z not in LocationZ):
                 LocationY.append(y)
@@ -146,11 +144,9 @@ async def on_guild_join(guild):
     InConfig = False
     for x in range(len(Config["guilds"])):
         if int(Config["guilds"][x]["guildID"]) == int(guild.id) and InConfig != True:
-            print("Bot joined a guild, however a config is already setup for"+guild.name+". Skipping default config setting")
+            print("Bot joined a guild, however a config is already setup for "+guild.name+". Skipping default config setting")
             InConfig = True
-        else:
-            pass
-    if InConfig == False:
+    if InConfig != True:
         Config["guilds"].append({"guildID" : str(guild.id), "prefix" : "$", "pass-command" : True, "chat" : "all"})
         print("Bot joined a new server, set default config for "+guild.name)
         with open("config.json", "w") as configFile:
@@ -161,26 +157,23 @@ async def on_guild_join(guild):
 
 @bot.event
 async def on_message(message):
-    location = 0
-    Allowed = False
     if isinstance(message.channel, discord.DMChannel):
-        pass
+        return
     else:
-        for x in range(len(Config["guilds"])):
-            if int(Config["guilds"][x]["guildID"]) == int(message.guild.id):
-                location = x
+        location = get_loc(message.guild.id)
         if Config["guilds"][location]["chat"] == "all":
             Allowed = True
         elif Config["guilds"][location]["chat"] == str(message.channel.id):
             Allowed = True
         else:
-            return
+            Allowed = False
         if message.author != bot.user:
             prefix = get_prefix(bot, message)
             if Allowed == True:
-                await bot.process_commands(message)
-            if bot.user.mentioned_in(message):
-                await message.channel.send("Hello there! My prefix is "+prefix+" if you have anymore issues. Run: "+prefix+"Help")
+                if bot.user.mentioned_in(message):
+                    await message.channel.send("Hello there! My prefix is "+prefix+" if you have anymore issues. Run: "+prefix+"Help")
+                else:
+                    await bot.process_commands(message)
 
 # This is the password command. It takes the passlen - lenght of the password - and passuni - a 1 or 0 which sets either Unicode or Ascii as the go to characterset for the password. It then sends the password via a DM that auto deletes after 30 seconds.
 
@@ -200,13 +193,12 @@ async def Pass(ctx, PassLen, PassUni):
         else:
             if PassUni == "1" or PassUni == "0":
                 Pass = PassGen.PassProcess(int(PassLen), PassUni)
-                member = ctx.message.author
                 #Checks if the password uses unicode or not
                 if PassUni == "1":
                     UnicodeYesNo = "does"
                 else:
                     UnicodeYesNo = "does not"
-                channel = await member.create_dm()
+                channel = await ctx.message.author.create_dm()
                 embed = discord.Embed(title = "Password", color = 0x33ffff) #Aqua
                 embed.add_field(name = "Here is your generated password:", value = Pass)
                 embed.set_footer(text = "Made by RRBuilder#5922. This password is "+PassLen+" characters long and "+UnicodeYesNo+" include unicode. This message will auto delete in 60 seconds :)")
@@ -231,7 +223,6 @@ async def Help(ctx):
 @bot.command(name = 'Comp', aliases = ["comp", "Compromised", "compromised", "hacked", "Hacked", "CMP", "cmp"])
 @commands.cooldown(1, 10, commands.BucketType.user)
 async def Comp(ctx, username):
-    text = ""
     if len(username) > 16 or len(username) <= 0:
         raise Exception ("Username too long")
     uuid, success = UUIDFetch(username)
@@ -290,10 +281,10 @@ async def Prefix(ctx, prefix):
 @commands.has_permissions(administrator = True)
 @commands.cooldown(1, 60, commands.BucketType.guild)
 async def Setchat(ctx, option):
+    location = get_loc(ctx.guild.id)
     if option != "all" and option != "this":
         await ctx.send("Hey! Please use either ``all`` or ``this`` for this command :)")
     elif option == "all":
-        location = get_loc(ctx.guild.id)
         if Config["guilds"][location]["chat"] == "all":
             await ctx.send("Your bot chat is already set to respond in all channels :)")
         else:
@@ -302,13 +293,11 @@ async def Setchat(ctx, option):
             with open("config.json", "w") as configFile:
                 json.dump(Config, configFile)
     else:
-        location = get_loc(ctx.guild.id)
-        ChannelID = str(ctx.channel.id)
-        if Config["guilds"][location]["chat"] == ChannelID:
+        if Config["guilds"][location]["chat"] == str(ctx.channel.id):
             await ctx.send("Your bot chat is already set to this channel :)")
         else:
             await ctx.send("Set the bot to only respond in this chat :)")
-            Config["guilds"][location]["chat"] = ChannelID
+            Config["guilds"][location]["chat"] = str(ctx.channel.id)
             with open("config.json", "w") as configFile:
                 json.dump(Config, configFile)
 

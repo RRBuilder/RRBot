@@ -18,8 +18,6 @@ def StatProcess(UUID):
     r = requests.head("https://api.hypixel.net/player?key="+key+"&uuid="+UUID)
     if r.status_code != 200:
         print("The API did not respond with a 200 status code, it gave a "+str(r.status_code))
-    else:
-        pass
 
     try:
         Username = Stats["player"]["displayname"]
@@ -145,14 +143,11 @@ def GetMostCoins(UUID):
 
     CoinsList, Gameslist = InsertionSort(CoinsList, GamesList)
 
-    index = len(CoinsList)-1
-    MostCoins = CoinsList[index]
-    MostCoinsGame = GamesList[index]
+    MostCoins = CoinsList[len(CoinsList)-1]
+    MostCoinsGame = GamesList[len(CoinsList)-1]
     return MostCoins, MostCoinsGame, Username, API_Status
 
 def InsertionSort(CoinsList, GamesList):
-    value = 0
-    index = 0
     for i in range(1, len(CoinsList)):
         valueCoins = CoinsList[i]
         valueGames = GamesList[i]
