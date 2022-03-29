@@ -20,7 +20,7 @@ Red = 0xff0000
 Yellow = 0xffeb2a
 Green = 0x80c904
 
-# Imports config. Guild settings stored inside a .json file.
+# Imports config. Guild settings stored inside a .json file
 
 
 def configImport():
