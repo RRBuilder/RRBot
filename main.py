@@ -3,8 +3,9 @@ from functools import lru_cache, wraps
 from datetime import datetime, timedelta
 
 # Tiems LRU cache wrapped function.
-def timed_lru_cache(seconds: int, maxsize: int = 128):
 
+
+def timed_lru_cache(seconds: int, maxsize: int = 128):
     def wrapper_cache(func):
 
         func = lru_cache(maxsize=maxsize)(func)
@@ -12,7 +13,6 @@ def timed_lru_cache(seconds: int, maxsize: int = 128):
         func.expiration = datetime.utcnow() + func.lifetime
 
         @wraps(func)
-
         def wrapped_func(*args, **kwargs):
             if datetime.utcnow() >= func.expiration:
                 func.cache_clear()
@@ -23,14 +23,18 @@ def timed_lru_cache(seconds: int, maxsize: int = 128):
         return wrapped_func
 
     return wrapper_cache
-    #Taken from stack overflow. 
+# Taken from stack overflow.
 
 # Function to get rid of miliseconds
+
+
 def TimeSnip(timewhen):
     timewhen = int(str(timewhen)[0:-3])
     return timewhen
 
 # Function to fetch the UUID of the passed through user.
+
+
 @lru_cache(maxsize = 250)
 def UUIDFetch(username):
     success = True

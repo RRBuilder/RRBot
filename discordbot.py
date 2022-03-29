@@ -1,7 +1,7 @@
 import json
 from decouple import config
 from discord.ext import commands
-from discord.ext.commands import cooldown, BucketType
+from discord.ext.commands import BucketType
 import discord
 from dotenv import load_dotenv
 import passwordgen_program as PassGen
@@ -9,13 +9,12 @@ from main import UUIDFetch
 from GamesAPI import GamesList as GamesAPI
 from Session import MainProcess as SessionAPI
 from Coins import GetMostCoins
-import time
 
 load_dotenv()
 TOKEN = config("DISCORD_TOKEN")
 
+# Imports config. Guild settings stored inside a .json file.
 
-#Imports config. Guild settings stored inside a .json file.
 
 def configImport():
     x = open("config.json", "r")
@@ -23,9 +22,11 @@ def configImport():
     x.close()
     return data
 
+
 Config = configImport()
 
 # Fetching any possible preset guild bot prefix, if none is found the default "$" is set
+
 
 def get_prefix(bot, msg):
     Set = False
@@ -36,7 +37,9 @@ def get_prefix(bot, msg):
     if Set == False:
         return "$"
 
-# Getting a boolean value to see if the pass command is turned off, and returning a boolean to be used when the pass command is ran
+# Getting a boolean value to see if the pass command is turned off, and
+# returning a boolean to be used when the pass command is ran
+
 
 def get_pass(bot, ctx):
     Set = False
@@ -49,6 +52,7 @@ def get_pass(bot, ctx):
 
 # Function to find the matching location of a set guildID within the config.json file.
 
+
 def get_loc(guildid):
     for y in range(len(Config["guilds"])):
         if Config["guilds"][y]["guildID"] == str(guildid):
@@ -57,10 +61,11 @@ def get_loc(guildid):
 
 # Setting up the bot, removing the preset help command.
 
+
 bot = commands.Bot(command_prefix = get_prefix)
 bot.remove_command('help')
 
-# Courtine ran when a command experiances an error, allows to handle non code related exceptions, for example: Command cooldowns or Missing user permissions
+# Courtine ran when a command experiances an error, allows to handle non code related exceptions, for example: Command cooldowns or Missing user permissions. Also is used in input validation
 
 @bot.event
 async def on_command_error(ctx, error):
