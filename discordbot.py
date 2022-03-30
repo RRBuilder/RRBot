@@ -1,7 +1,6 @@
 import json
 from decouple import config
 from discord.ext import commands
-from discord.ext.commands import BucketType
 import discord
 from dotenv import load_dotenv
 import passwordgen_program as PassGen
