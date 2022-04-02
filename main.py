@@ -145,7 +145,7 @@ def GameReadable(gameType):
         game = "Arena Brawl"
         pass
     elif gameType == "ARCADE":
-        game = "Aracade"
+        game = "Arcade"
         pass
     elif gameType == "VAMPIREZ":
         game = "VampireZ"
