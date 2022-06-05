@@ -102,6 +102,9 @@ def GameReadable(gameType):
     elif gameType == "PROTOTYPE":
         game = "Prototype"
         pass
+    elif gameType == "WOOL_GAMES":
+        game = "Wool Wars"
+        pass
     elif gameType == "HOUSING":
         game = "Housing"
         pass

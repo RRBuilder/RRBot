@@ -21,7 +21,6 @@ Green = 0x80c904
 
 # Imports config. Guild settings stored inside a .json file
 
-
 def configImport():
     x = open("config.json", "r")
     data = json.load(x)
@@ -71,7 +70,8 @@ def get_loc(guildid):
 bot = commands.Bot(command_prefix = get_prefix)
 bot.remove_command('help')
 
-# Courtine ran when a command experiances an error, allows to handle non code related exceptions, for example: Command cooldowns or Missing user permissions. Also is used in input validation
+# Courtine ran when a command experiances an error, allows to handle non code related exceptions, for example:
+#Command cooldowns or Missing user permissions. Also is used in input validation
 
 @bot.event
 async def on_command_error(ctx, error):
@@ -86,6 +86,10 @@ async def on_command_error(ctx, error):
     elif isinstance(error, discord.ext.commands.errors.MissingPermissions):
         embed = discord.Embed(color = Red)
         embed.add_field(name = "Error", value = "Sorry about that, you do not have the required permissions to run this!")
+        await ctx.send(embed = embed)
+    elif isinstance(error, discord.ext.commands.errors.CommandNotFound):
+        embed = discord.Embed(color = Red)
+        embed.add_field(name = "Error", value = "This is not a valid command!")
         await ctx.send(embed = embed)
     elif isinstance(error, discord.ext.commands.errors.CommandInvokeError):
         if str(error) == "Command raised an exception: Exception: Password too small":
