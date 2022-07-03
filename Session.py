@@ -2,23 +2,29 @@ import requests
 from main import timed_lru_cache, DateDisplay, LengthProcess, GameReadable, TimeSnip
 from decouple import config
 import time
+import datetime
 
 key = config("API_TOKEN")
 
 # Fucntion to request the stats of a player.
 def StatsRequest(UUID):
-    API_Status = True
+    TimeNow = str(datetime.datetime.now().strftime("%x %X"))
     try:
         #fetches the player stats of a player.
         Stats = requests.get("https://api.hypixel.net/player?key="+key+"&uuid="+UUID).json()
     except:
-        API_Status = False
-        print("Something went wrong talking to the session API!")
+        print(TimeNow+" Something went wrong talking to the session API!")
+        raise Exception("API appears down")
 
     r = requests.head("https://api.hypixel.net/player?key="+key+"&uuid="+UUID)
     if r.status_code != 200:
-        print("The API did not respond with a 200 status code, it gave a "+str(r.status_code))
-        API_Status = False
+        print(TimeNow+" The API did not respond with a 200 status code, it gave a "+str(r.status_code))
+        raise Exception("API appears down")
+
+    try:
+        Username = Stats["player"]["displayname"]
+    except:
+        raise Exception("Username is unknown")
 
     try:
         Version = Stats["player"]["mcVersionRp"]
@@ -48,27 +54,25 @@ def StatsRequest(UUID):
     except:
         LastGame = "N/A"
 
-    try:
-        Username = Stats["player"]["displayname"]
-    except:
-        Username = "Unknown"
-
-    return Version, LastLogin, LastLogout, UserLang, LastGame, Username, API_Status
+    return Version, LastLogin, LastLogout, UserLang, LastGame, Username
 
 #Main function used to process the player data
 @timed_lru_cache(600)
 def MainProcess(UUID):
-    Version, LastLogin, LastLogout, UserLang, LastGame, Username, API_Status = StatsRequest(UUID)
-    LastLoginRead = DateDisplay(LastLogin)
-    LastLogoutRead = DateDisplay(LastLogout)
+    Version, LastLogin, LastLogout, UserLang, LastGame, Username = StatsRequest(UUID)
+
+    LastLoginReadable = DateDisplay(LastLogin)
+    LastLogoutReadable = DateDisplay(LastLogout)
+
     if LastLogout < 0 or LastLogout == 0:
         LastLogout = time.time()
-        When = str(LastLogout)[0:-8]
+        Timestamp = str(LastLogout)[0:-8]
     else:
-        When = TimeSnip(LastLogout)
+        Timestamp = TimeSnip(LastLogout)
     if LastLogin == 0:
         Length = "Player online/Game ongoing."
     else:
         Length = LengthProcess(LastLogin, LastLogout)
     LastGame = GameReadable(LastGame)
-    return Version, LastLoginRead, LastLogoutRead, UserLang, LastGame, Length, Username, API_Status, When
+
+    return Version, LastLoginReadable, LastLogoutReadable, UserLang, LastGame, Length, Username, Timestamp

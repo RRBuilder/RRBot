@@ -37,18 +37,16 @@ def TimeSnip(timewhen):
 
 @lru_cache(maxsize = 250)
 def UUIDFetch(username):
-    success = True
     try:
         uuid = requests.get("https://api.mojang.com/users/profiles/minecraft/"+username).json()['id']
     except:
-        uuid = ""
-        success = False
+        raise Exception("Username is invalid")
 
     r = requests.head("https://api.mojang.com/users/profiles/minecraft/"+username)
     if r.status_code != 200:
-        success = False
+        raise Exception("Username is invalid")
 
-    return uuid, success
+    return uuid
 
 # Generates a date.
 def DateDisplay(timevar):
@@ -83,7 +81,6 @@ def LengthProcess(Start, End):
 
 # Converts games from the API to more readable forms.
 def GameReadable(gameType):
-    game = ""
     if gameType == "BEDWARS":
         game = "Bedwars"
         pass

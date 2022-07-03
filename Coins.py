@@ -1,29 +1,30 @@
 import requests
 from main import timed_lru_cache
 from decouple import config
+import datetime
 
 key = config("API_TOKEN")
 
 def StatProcess(UUID):
+    TimeNow = str(datetime.datetime.now().strftime("%x %X"))
     Coins = []
     Games = ["Arcade", "The Walls", "Mega Walls", "Smash Heroes", "Turbo Cart Racers", "SkyWars", "Paint Ball", "Cops n Crims", "TNT Games", "UHC", "Warlords", "Vampire Z", "Blitz SG", "Crazy Walls", "Arena Brawl", "Quakecraft", "Speed UHC", "SkyClash", "Build Battle", "Duels", "Murder Mystery", "Bedwars"]
-    API_Status = True
 
     try:
         Stats = requests.get("https://api.hypixel.net/player?key="+key+"&uuid="+UUID).json()
     except:
-        API_Status = False
         print("Something went wrong talking to the session API!")
+        raise Exception("API appears down")
 
     r = requests.head("https://api.hypixel.net/player?key="+key+"&uuid="+UUID)
     if r.status_code != 200:
-        API_Status = False
-        print("The API did not respond with a 200 status code, it gave a "+str(r.status_code))
+        print(TimeNow+" The API did not respond with a 200 status code, it gave a "+str(r.status_code))
+        raise Exception("API appears down")
 
     try:
         Username = Stats["player"]["displayname"]
     except:
-        Username = "Unknown"
+        raise Exception("Username is unknown")
 
 
     try:
@@ -136,17 +137,17 @@ def StatProcess(UUID):
     except:
         Coins.append(0)
 
-    return Coins, Games, Username, API_Status
+    return Coins, Games, Username
 
 @timed_lru_cache(600)
 def GetMostCoins(UUID):
-    CoinsList, GamesList, Username, API_Status = StatProcess(UUID)
+    CoinsList, GamesList, Username = StatProcess(UUID)
 
     CoinsList, Gameslist = InsertionSort(CoinsList, GamesList)
 
     MostCoins = CoinsList[len(CoinsList)-1]
     MostCoinsGame = GamesList[len(CoinsList)-1]
-    return MostCoins, MostCoinsGame, Username, API_Status
+    return MostCoins, MostCoinsGame, Username
 
 def InsertionSort(CoinsList, GamesList):
     for i in range(1, len(CoinsList)):

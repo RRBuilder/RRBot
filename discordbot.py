@@ -8,6 +8,10 @@ from main import UUIDFetch
 from GamesAPI import GamesList as GamesAPI
 from Session import MainProcess as SessionAPI
 from Coins import GetMostCoins
+import logging
+import time
+
+logging.basicConfig(filename="bot.log", level = logging.INFO, format='%(levelname)s %(asctime)s %(message)s')
 
 load_dotenv()
 TOKEN = config("DISCORD_TOKEN")
@@ -92,56 +96,65 @@ async def on_command_error(ctx, error):
         embed.add_field(name = "Error", value = "This is not a valid command!")
         await ctx.send(embed = embed)
     elif isinstance(error, discord.ext.commands.errors.CommandInvokeError):
-        if str(error) == "Command raised an exception: Exception: Password too small":
+        #Start of error string, is constant with all exceptions.
+        Start = "Command raised an exception: "
+
+        if str(error) == Start+"Exception: Password too small":
             embed = discord.Embed(color = Red)
             embed.add_field(name = "Error", value = "That password is too small! Please ensure you enter a lenght of at least 12!")
             await ctx.send(embed = embed)
 
-        elif str(error) == "Command raised an exception: Exception: Password too big":
+        elif str(error) == Start+"Exception: Password too big":
             embed = discord.Embed(color = Red)
             embed.add_field(name = "Error", value = "That password is too long! Please ensure you enter a lenght that is smaller than 256!")
             await ctx.send(embed = embed)
 
-        elif str(error) == "Command raised an exception: Exception: PassUni Invalid":
+        elif str(error) == Start+"Exception: PassUni Invalid":
             embed = discord.Embed(color = Red)
             embed.add_field(name = "Error", value = "Please enter either 0 for ASCII or 1 for Unicode")
             await ctx.send(embed = embed)
 
-        elif str(error) == "Command raised an exception: Exception: Username too long":
+        elif str(error) == Start+"Exception: Username too long":
             embed = discord.Embed(color = Red)
             embed.add_field(name = "Error", value = "Please enter a username with a maximum lenght of 16.")
             await ctx.send(embed = embed)
 
-        elif str(error) == "Command raised an exception: Forbidden: 403 Forbidden (error code: 50007): Cannot send messages to this user":
+        elif str(error) == Start+"Forbidden: 403 Forbidden (error code: 50007): Cannot send messages to this user":
             embed = discord.Embed(color = Red)
             embed.add_field(name = "Error", value = "Cannot send messages to this user!")
             await ctx.send(embed = embed)
 
+        elif str(error) == Start+"Exception: API appears down":
+            logging.warning("API appears down")
+            embed = discord.Embed(color = Red)
+            embed.add_field(name = "Error", value = "API appears to be down")
+            await ctx.send(embed = embed)
+
+        elif str(error) == Start+"Exception: Username is unknown":
+            embed = discord.Embed(color = Yellow)
+            embed.add_field(name = "Alert!", value = "This username returns a mainly empty file. This is likely one of those usernames that would return no name on plancke and is a general pain to work with. So it is skipped.")
+            await ctx.send(embed = embed)
+
+        elif str(error) == Start+"Exception: Username is invalid":
+            embed = discord.Embed(color = Red)
+            embed.add_field(name = "Error", value = "Sorry, but that username is not valid! Make sure you re-enter it")
+            await ctx.send(embed = embed)
+
         else:
             await ctx.send("Some error happened, printed in console.")
+            logging.error(error)
             raise error
     else:
         await ctx.send("Some error happened, printed in console.")
+        logging.error(error)
         raise error
-
-# Tells the user the username they entered resolves to incomplete data.
-
-async def UsernameInvalid(ctx):
-    embed = discord.Embed(color = Yellow)
-    embed.add_field(name = "Alert!", value = "This username returns a mainly empty file. This is likely one of those usernames that would return no name on plancke and is a general pain to work with. So it is skipped.")
-    await ctx.send(embed = embed)
-
-# Sends an embed informing user the username they entered didnt resolve to a UUID
-
-async def UsernameError(ctx):
-    embed = discord.Embed(color = Red)
-    embed.add_field(name = "Error", value = "Sorry, but that username is not valid! Make sure you re-enter it")
-    await ctx.send(embed = embed)
 
 # This is ran when the bot is ready. This function allows me to catch errors in the config file, more notably it missing any guilds inside as it is possible someone can add the bot to their guild while its offline, and then the on_guild_join will not run.
 
 @bot.event
 async def on_ready():
+    logging.info("Bot is starting...")
+    start_time = time.time()
     guildIDs = []
     for guild in bot.guilds:
         guildIDs.append(guild.id)
@@ -165,11 +178,14 @@ async def on_ready():
             ##{"guilds" : []}
         with open("config.json", "w") as configFile:
             json.dump(Config, configFile)
+    logging.info("The bot connected to "+str(len(guildIDs))+" guild(s).")
+    logging.info("Bot is up. Time taken to initialize: "+"%s seconds" % (round(time.time() - start_time, 5)))
 
 # This runs when the bot joins a guild. It checks if the bot was already in the guild and therefore has a config for the guild already set in the json file and if not it will make a new entry.
 
 @bot.event
 async def on_guild_join(guild):
+    logging.info("Bot has joined a guild")
     InConfig = False
     for x in range(len(Config["guilds"])):
         if int(Config["guilds"][x]["guildID"]) == int(guild.id) and InConfig != True:
@@ -254,37 +270,31 @@ async def Help(ctx):
 async def Comp(ctx, username):
     if len(username) > 16 or len(username) <= 0:
         raise Exception("Username too long")
-    uuid, success = UUIDFetch(username)
-    if success == False:
-        await UsernameError(ctx)
-    else:
-        Version, LastLoginRead, LastLogoutRead, UserLang, LastGame, Length, UsernameRead, API_Status, When = SessionAPI(uuid)
-        Games, Maps, TimesStarted, TimesEnded, Lens, API_Status2 = GamesAPI(uuid)
 
-        if API_Status == False or API_Status2 == False:
-            await ctx.send("The API appears to be down.")
-        else:
-            if UsernameRead == "Unknown":
-                await UsernameInvalid(ctx)
+    uuid = UUIDFetch(username)
+
+    Session_Version, Session_LastLogin, Session_LastLogout, Session_UserLanguage, Session_LastGameType, Session_Length, Session_Username, Session_Timestamp = SessionAPI(uuid)
+
+    Games, Maps, TimesStarted, TimesEnded, Lenghts = GamesAPI(uuid)
+
+    embed = discord.Embed(title = "Last session.", color = Aqua)
+    text = "```\nUUID: "+uuid+"```"+"```\nVersion: "+Session_Version+"```"+"```\nLast Login: "+str(Session_LastLogin)+"```"+"```\nLast Logout: "+str(Session_LastLogout)+"```"+"```\nLanguage: "+Session_UserLanguage+"```"+"```\nLast game type: "+Session_LastGameType+"```"+"```\nSession length: "+str(Session_Length)+"```"+"\nThe above happened <t:"+str(Session_Timestamp)+":R>"
+    embed.add_field(name = "Here is the last player session for ```"+Session_Username+"```", value = text)
+    await ctx.send(embed = embed)
+    if len(Games) == 0:
+        embed = discord.Embed(color = Yellow)
+        embed.add_field(name = "Alert!", value = "No games were detected for the username entered! They likely haven't played any games recently. :)")
+        await ctx.send(embed = embed)
+    else:
+        embed = discord.Embed(title = "Recent games.", color = Aqua)
+        for x in range(len(Games)):
+            count = x+1
+            if len(Games) < count:
+                pass
             else:
-                embed = discord.Embed(title = "Last session.", color = Aqua)
-                text = "```\nUUID: "+uuid+"```"+"```\nVersion: "+Version+"```"+"```\nLast Login: "+str(LastLoginRead)+"```"+"```\nLast Logout: "+str(LastLogoutRead)+"```"+"```\nLanguage: "+UserLang+"```"+"```\nLast game type: "+LastGame+"```"+"```\nSession length: "+str(Length)+"```"+"\nThe above happened <t:"+str(When)+":R>"
-                embed.add_field(name = "Here is the last player session for ```"+UsernameRead+"```", value = text)
-                await ctx.send(embed = embed)
-                if len(Games) == 0:
-                    embed = discord.Embed(color = Yellow)
-                    embed.add_field(name = "Alert!", value = "No games were detected for the username entered! They likely haven't played any games recently. :)")
-                    await ctx.send(embed = embed)
-                else:
-                    embed = discord.Embed(title = "Recent games.", color = Aqua)
-                    for x in range(len(Games)):
-                        count = x+1
-                        if len(Games) < count:
-                            pass
-                        else:
-                            text = "```\nGameType: "+str(Games[x])+"```"+"```\nMap: "+str(Maps[x])+"```"+"```\nTime Started: "+str(TimesStarted[x])+"```"+"```\nTime Ended: "+str(TimesEnded[x])+"```"+"```\nLength: "+str(Lens[x]+"\n\n```")
-                            embed.add_field(name = "Game: "+str(count), value = text)
-                    await ctx.send(embed = embed)
+                text = "```\nGameType: "+str(Games[x])+"```"+"```\nMap: "+str(Maps[x])+"```"+"```\nTime Started: "+str(TimesStarted[x])+"```"+"```\nTime Ended: "+str(TimesEnded[x])+"```"+"```\nLength: "+str(Lenghts[x]+"\n\n```")
+                embed.add_field(name = "Game: "+str(count), value = text)
+        await ctx.send(embed = embed)
 
 # Prefix command. Used to change and set a new prefix for the bot. Only usable by server admins. Takes in message context and the prefix as a parameter. Has a guild cooldown of 60 seconds. Also saves the prefix to the config.json file
 
@@ -358,22 +368,13 @@ async def passtoggle(ctx):
 async def mostcoins(ctx, username):
     if len(username) > 16 or len(username) <= 0:
         raise Exception ("Username too long")
-    uuid, success = UUIDFetch(username)
+    uuid = UUIDFetch(username)
 
-    if success == False:
-        await UsernameError(ctx)
-    else:
-        MostCoins, MostCoinsGame, UsernameRead, API_Status = GetMostCoins(uuid)
+    MostCoins, MostCoinsGame, Username = GetMostCoins(uuid)
 
-        if API_Status == False:
-            await ctx.send("The API appears to be down.")
-        else:
-            if UsernameRead == "Unknown":
-                await UsernameInvalid(ctx)
-            else:
-                text = "**Game:** ```"+str(MostCoinsGame)+"```\n**Amount:** ```"+str(MostCoins)+"```"
-                embed = discord.Embed(color = Green)
-                embed.add_field(name = "Most coins for "+UsernameRead, value = text)
-                await ctx.send(embed = embed)
+    text = "**Game:** ```"+str(MostCoinsGame)+"```\n**Amount:** ```"+str(MostCoins)+"```"
+    embed = discord.Embed(color = Green)
+    embed.add_field(name = "Most coins for "+Username, value = text)
+    await ctx.send(embed = embed)
 
 bot.run(TOKEN)
