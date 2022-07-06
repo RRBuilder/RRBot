@@ -125,7 +125,6 @@ async def on_command_error(ctx, error):
             await ctx.send(embed = embed)
 
         elif str(error) == Start+"Exception: API appears down":
-            logging.warning("API appears down")
             embed = discord.Embed(color = Red)
             embed.add_field(name = "Error", value = "API appears to be down")
             await ctx.send(embed = embed)
