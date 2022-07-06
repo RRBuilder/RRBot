@@ -3,6 +3,7 @@ from main import timed_lru_cache, DateDisplay, LengthProcess, GameReadable, Time
 from decouple import config
 import time
 import datetime
+import logging
 
 key = config("API_TOKEN")
 
@@ -65,14 +66,14 @@ def MainProcess(UUID):
     LastLogoutReadable = DateDisplay(LastLogout)
 
     if LastLogout < 0 or LastLogout == 0:
-        LastLogout = time.time()
-        Timestamp = str(LastLogout)[0:-8]
+        TimeStamp = int(time.time())
     else:
         Timestamp = TimeSnip(LastLogout)
     if LastLogin == 0:
         Length = "Player online/Game ongoing."
     else:
         Length = LengthProcess(LastLogin, LastLogout)
+
     LastGame = GameReadable(LastGame)
 
     return Version, LastLoginReadable, LastLogoutReadable, UserLang, LastGame, Length, Username, Timestamp
