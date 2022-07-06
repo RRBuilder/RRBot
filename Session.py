@@ -3,7 +3,6 @@ from main import timed_lru_cache, DateDisplay, LengthProcess, GameReadable, Time
 from decouple import config
 import time
 import datetime
-import logging
 
 key = config("API_TOKEN")
 
