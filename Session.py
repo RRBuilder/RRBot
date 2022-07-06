@@ -3,22 +3,22 @@ from main import timed_lru_cache, DateDisplay, LengthProcess, GameReadable, Time
 from decouple import config
 import time
 import datetime
+import logging
 
 key = config("API_TOKEN")
 
 # Fucntion to request the stats of a player.
 def StatsRequest(UUID):
-    TimeNow = str(datetime.datetime.now().strftime("%x %X"))
     try:
         #fetches the player stats of a player.
         Stats = requests.get("https://api.hypixel.net/player?key="+key+"&uuid="+UUID).json()
     except:
-        print(TimeNow+" Something went wrong talking to the session API!")
+        logging.warning("Something went wrong talking to the session API!")
         raise Exception("API appears down")
 
     r = requests.head("https://api.hypixel.net/player?key="+key+"&uuid="+UUID)
     if r.status_code != 200:
-        print(TimeNow+" The API did not respond with a 200 status code, it gave a "+str(r.status_code))
+        logging.warning("The API did not respond with a 200 status code, it gave a "+str(r.status_code))
         raise Exception("API appears down")
 
     try:

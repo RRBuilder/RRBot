@@ -2,22 +2,22 @@ from main import timed_lru_cache, DateDisplay, LengthProcess, GameReadable
 import requests
 from decouple import config
 import datetime
+import logging
 
 key = config("API_TOKEN")
 
 def GameRequest(UUID):
-    TimeNow = str(datetime.datetime.now().strftime("%x %X"))
     try:
         # Fetches recent game data from the Hypixel API.
         game = requests.get("https://api.hypixel.net/recentgames?key="+key+"&uuid="+UUID).json()
     except:
-        print(TimeNow+" Something went wrong talking to the recent games API!")
+        logging.warning("Something went wrong talking to the recent games API!")
         raise Exception("API appears down")
 
     r = requests.head("https://api.hypixel.net/recentgames?key="+key+"&uuid="+UUID)
     # Status code check to prevent errors pertaining to not receiving data.
     if r.status_code != 200:
-        print(TimeNow+" The API did not respond with a 200 status code, it gave a "+str(r.status_code))
+        logging.warning("The API did not respond with a 200 status code, it gave a "+str(r.status_code))
         raise Exception("API appears down")
 
     GameType, Map, TimeEnded, TimeStarted = GameProcess(game)
