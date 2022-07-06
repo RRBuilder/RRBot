@@ -68,10 +68,8 @@ def MainProcess(UUID):
         TimeStamp = int(time.time())
     else:
         Timestamp = TimeSnip(LastLogout)
-    if LastLogin == 0:
-        Length = "Player online/Game ongoing."
-    else:
-        Length = LengthProcess(LastLogin, LastLogout)
+
+    Length = LengthProcess(LastLogin, LastLogout)
 
     LastGame = GameReadable(LastGame)
 
