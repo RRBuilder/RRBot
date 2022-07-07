@@ -65,7 +65,7 @@ def MainProcess(UUID):
     LastLogoutReadable = DateDisplay(LastLogout)
 
     if LastLogout < 0 or LastLogout == 0:
-        TimeStamp = int(time.time())
+        Timestamp = int(time.time())
     else:
         Timestamp = TimeSnip(LastLogout)
 
