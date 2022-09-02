@@ -1,186 +1,224 @@
-import json
-import os
-from decouple import config
-from discord.ext import commands
-import discord
-from dotenv import load_dotenv
-import passwordgen_program as PassGen
-from main import UUIDFetch
-from GamesAPI import GamesList as GamesAPI
-from Session import MainProcess as SessionAPI
-from Coins import GetMostCoins
-import logging
-import time
+# Imports
+import json # to handle json files
+import os # to handle directories
+import logging # to work with logging
+import time # to time bot bootup times
+from decouple import config # to work with .env file
+from discord.ext import commands # command functionality for discord.py
+import discord # main discord API functionality
+from dotenv import load_dotenv # to work with .env file
 
+# File imports
+import passwordgen_program as PassGen # Imports password generator source file
+from main import UUIDFetch # Imports function for fetching Minecraft UUID
+from GamesAPI import GamesList as GamesAPI # Imports function for pinging Hypixel API
+from Session import MainProcess as SessionAPI # Imports function for pinging Hypixel API
+from Coins import GetMostCoins # Imports most coins function
+
+# Fetching file directory
 realpath = os.path.realpath(__file__)
 directory = realpath[0:-20]
 
+# Setting up logging
 logging.basicConfig(filename=directory+"bot.log", level = logging.INFO, format='%(levelname)s %(asctime)s %(message)s')
 
+# Setting up the Discord API token from .env file
 load_dotenv()
 TOKEN = config("DISCORD_TOKEN")
 
-# Setting colour variables
-
+# Setting preset colour variables to be used with Discord embeds
 Aqua = 0x33ffff
 Red = 0xff0000
 Yellow = 0xffeb2a
 Green = 0x80c904
 
-# Imports config. Guild settings stored inside a .json file
-
 def configImport():
+# Imports config. Guild settings stored inside a .json file
     x = open(directory+"config.json", "r")
     data = json.load(x)
     x.close()
     return data
 
-
+# Calls config import function
 Config = configImport()
 
-# Fetching any possible preset guild bot prefix, if none is found the default "$" is set
-
-
 def get_prefix(bot, msg):
+# Fetching any possible preset guild bot prefix, if none is found the default "$" is set
     Set = False
+    # Searching through config file for a match in guild ID
     for y in range(len(Config["guilds"])):
         if int(Config["guilds"][y]["guildID"]) == int(msg.guild.id):
+            # Returning preset prefix found in config
             return str(Config["guilds"][y]["prefix"])
             Set = True
+
+    # Setting default prefix if none is found in config file
     if Set == False:
         return "$"
 
-# Getting a boolean value to see if the pass command is turned off, and
-# returning a boolean to be used when the pass command is ran
-
-
 def get_pass(bot, ctx):
+# Getting a boolean value to see if the pass command is turned off, and returning a boolean to be used when the pass command is ran
     Set = False
     for y in range(len(Config["guilds"])):
         if int(Config["guilds"][y]["guildID"]) == int(ctx.guild.id):
             return str(Config["guilds"][y]["pass-command"])
             Set = True
+
+    # Checks if the pass command disabling boolean has been set in config, if not, the command is enabled by default
     if Set == False:
         return True
 
-# Function to find the matching location of a set guildID within the config.json file
-
-
 def get_loc(guildid):
+# Function to find the matching location of a set guildID within the config.json file
     for y in range(len(Config["guilds"])):
         if Config["guilds"][y]["guildID"] == str(guildid):
             location = y
     return location
 
 # Setting up the bot, removing the preset help command.
-
-
 bot = commands.Bot(command_prefix = get_prefix)
 bot.remove_command('help')
 
-# Courtine ran when a command experiances an error, allows to handle non code related exceptions, for example:
-#Command cooldowns or Missing user permissions. Also is used in input validation
 
 @bot.event
+# Courtine ran when a command experiances an error, allows to handle non code related exceptions, for example:
+# Command cooldowns or Missing user permissions. Also is used in input validation
 async def on_command_error(ctx, error):
+
+    # Error fires when a command is ran but a parameter is missing. For example the name string from !cmp
     if isinstance(error, discord.ext.commands.errors.MissingRequiredArgument):
         embed = discord.Embed(color = Red)
         embed.add_field(name = "Error", value = "A parameter is missing!")
         await ctx.send(embed = embed)
+
+    # Error fires when a command is ran but the command cooldown is still in effect
     elif isinstance(error, commands.CommandOnCooldown):
         embed = discord.Embed(color = Red)
         embed.add_field(name = "Error", value = "Command is on cooldown!")
         await ctx.send(embed = embed)
+
+    # Error fires when user issuing the command is missing Discord side permissions
     elif isinstance(error, discord.ext.commands.errors.MissingPermissions):
         embed = discord.Embed(color = Red)
         embed.add_field(name = "Error", value = "Sorry about that, you do not have the required permissions to run this!")
         await ctx.send(embed = embed)
+
+    # Error fires when someone uses the prefix but doesnt issue a valid command
     elif isinstance(error, discord.ext.commands.errors.CommandNotFound):
         embed = discord.Embed(color = Red)
         embed.add_field(name = "Error", value = "This is not a valid command!")
         await ctx.send(embed = embed)
+
+    # Error fires when the command itself fires a error
     elif isinstance(error, discord.ext.commands.errors.CommandInvokeError):
         #Start of error string, is constant with all exceptions.
         Start = "Command raised an exception: "
 
+        # Error fires when the $pass command is passed a integer lower than 12
         if str(error) == Start+"Exception: Password too small":
             embed = discord.Embed(color = Red)
             embed.add_field(name = "Error", value = "That password is too small! Please ensure you enter a lenght of at least 12!")
             await ctx.send(embed = embed)
 
+        # Error fires when the $pass command is passed a integer higher than 256
         elif str(error) == Start+"Exception: Password too big":
             embed = discord.Embed(color = Red)
             embed.add_field(name = "Error", value = "That password is too long! Please ensure you enter a lenght that is smaller than 256!")
             await ctx.send(embed = embed)
 
+        # Error fires when the $pass command is passed a integer that isnt either 0 or 1
         elif str(error) == Start+"Exception: PassUni Invalid":
             embed = discord.Embed(color = Red)
             embed.add_field(name = "Error", value = "Please enter either 0 for ASCII or 1 for Unicode")
             await ctx.send(embed = embed)
 
+        # Error fires when a command handling a Minecraft usernames is passed a string that is longer than 16 (MC names cannot exceed 16 characters, no point checking Mojangs API for profile if the lengh > 16)
         elif str(error) == Start+"Exception: Username too long":
             embed = discord.Embed(color = Red)
             embed.add_field(name = "Error", value = "Please enter a username with a maximum lenght of 16.")
             await ctx.send(embed = embed)
 
+        # Error fires when Discord API shows that the bot is either Blocked or has DMs disabled, so when the bot tries to send a DM its forbidden.
         elif str(error) == Start+"Forbidden: 403 Forbidden (error code: 50007): Cannot send messages to this user":
             embed = discord.Embed(color = Red)
             embed.add_field(name = "Error", value = "Cannot send messages to this user!")
             await ctx.send(embed = embed)
 
+        # Error fires when any command detects a API outage/no response from the Hypixel API
         elif str(error) == Start+"Exception: API appears down":
             embed = discord.Embed(color = Red)
             embed.add_field(name = "Error", value = "API appears to be down")
             await ctx.send(embed = embed)
 
+        # Error fires when the Hypixel API returns a malformed response missing key information
         elif str(error) == Start+"Exception: Username is unknown":
             embed = discord.Embed(color = Yellow)
             embed.add_field(name = "Alert!", value = "This username returns a mainly empty file. This is likely one of those usernames that would return no name on plancke and is a general pain to work with. So it is skipped.")
             await ctx.send(embed = embed)
 
+        # Error fires when the Mojang API cannot find the MC profile name and hence cannot return a UUID
         elif str(error) == Start+"Exception: Username is invalid":
             embed = discord.Embed(color = Red)
             embed.add_field(name = "Error", value = "Sorry, but that username is not valid! Make sure you re-enter it")
             await ctx.send(embed = embed)
 
+        # Catching for any other errors
         else:
             await ctx.send("Some error happened, printed in console.")
             logging.error(error)
             raise error
+
+    # Catching for any other errors
     else:
         await ctx.send("Some error happened, printed in console.")
         logging.error(error)
         raise error
 
-# This is ran when the bot is ready. This function allows me to catch errors in the config file, more notably it missing any guilds inside as it is possible someone can add the bot to their guild while its offline, and then the on_guild_join will not run.
 
 @bot.event
+# This is ran when the bot is ready. This function allows me to catch errors in the config file, more notably it missing any guilds inside as it is possible someone can add the bot to their guild while its offline, and then the on_guild_join will not run.
 async def on_ready():
+
+    # Logs that bot is starting and initiates time variable used to time starting process
     logging.info("Bot is starting...")
     start_time = time.time()
     guildIDs = []
+
+    # Fetches and appens all current guilds the bot is connected to
     for guild in bot.guilds:
         guildIDs.append(guild.id)
+
+    # Prints the amount of guilds the bot connected to
     print("The bot connected to",len(guildIDs),"guild(s).")
+
     LocationZ = []
     LocationY = []
     IDFoundList = []
     IDLocations = []
+
+    # Searches through current connected to guilds for guilds within the config
     for z in range(len(guildIDs)):
         for y in range(len(Config["guilds"])):
+
+            # Adds a check to see if the guild within the config and the guild thats been connected to is already in a pair
             if int(guildIDs[z]) == int(Config["guilds"][y]["guildID"]) and (y not in LocationY or z not in LocationZ):
                 LocationY.append(y)
                 LocationZ.append(z)
                 IDFoundList.append(guildIDs[z])
+
+    # Checks for any guilds are not in the config, if not, it likely means the guild added the bot without it being online, so the on_guild_join function didn't fire
     for x in range(len(guildIDs)):
         if guildIDs[x] not in IDFoundList:
             IDLocations.append(x)
+
+    # Checks if the amount of guilds not in the config is not 0, if it is it means no guilds added the bot while the bot was down
     if len(IDLocations) != 0:
         for x in range(len(IDLocations)):
             Config["guilds"].append({"guildID" : str(guildIDs[IDLocations[x-1]]), "prefix" : "$", "pass-command" : True, "chat" : "all"})
             ##{"guilds" : []}
         with open(directory+"config.json", "w") as configFile:
             json.dump(Config, configFile)
+
     logging.info("The bot connected to "+str(len(guildIDs))+" guild(s).")
     logging.info("Bot is up. Time taken to initialize: "+"%s seconds" % (round(time.time() - start_time, 5)))
 
