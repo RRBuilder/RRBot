@@ -1,4 +1,5 @@
 import json
+import os
 from decouple import config
 from discord.ext import commands
 import discord
@@ -11,7 +12,10 @@ from Coins import GetMostCoins
 import logging
 import time
 
-logging.basicConfig(filename="bot.log", level = logging.INFO, format='%(levelname)s %(asctime)s %(message)s')
+realpath = os.path.realpath(__file__)
+directory = realpath[0:-20]
+
+logging.basicConfig(filename=directory+"bot.log", level = logging.INFO, format='%(levelname)s %(asctime)s %(message)s')
 
 load_dotenv()
 TOKEN = config("DISCORD_TOKEN")
@@ -26,7 +30,7 @@ Green = 0x80c904
 # Imports config. Guild settings stored inside a .json file
 
 def configImport():
-    x = open("config.json", "r")
+    x = open(directory+"config.json", "r")
     data = json.load(x)
     x.close()
     return data
@@ -175,7 +179,7 @@ async def on_ready():
         for x in range(len(IDLocations)):
             Config["guilds"].append({"guildID" : str(guildIDs[IDLocations[x-1]]), "prefix" : "$", "pass-command" : True, "chat" : "all"})
             ##{"guilds" : []}
-        with open("config.json", "w") as configFile:
+        with open(directory+"config.json", "w") as configFile:
             json.dump(Config, configFile)
     logging.info("The bot connected to "+str(len(guildIDs))+" guild(s).")
     logging.info("Bot is up. Time taken to initialize: "+"%s seconds" % (round(time.time() - start_time, 5)))
@@ -193,7 +197,7 @@ async def on_guild_join(guild):
     if InConfig != True:
         Config["guilds"].append({"guildID" : str(guild.id), "prefix" : "$", "pass-command" : True, "chat" : "all"})
         print("Bot joined a new server, set default config for "+guild.name)
-        with open("config.json", "w") as configFile:
+        with open(directory+"config.json", "w") as configFile:
             json.dump(Config, configFile)
 
 
@@ -307,7 +311,7 @@ async def Prefix(ctx, prefix):
     else:
         await ctx.send("Set prefix to "+prefix)
         Config["guilds"][location]["prefix"] = prefix
-        with open("config.json", "w") as configFile:
+        with open(directory+"config.json", "w") as configFile:
             json.dump(Config, configFile)
 
 # Setchat command. Only usable by admins. Used to set a response channel to the bot or allows it to respond in all channels if a response channel is already set.
@@ -325,7 +329,7 @@ async def Setchat(ctx, option):
         else:
             await ctx.send("Your bot will now respond in all channels")
             Config["guilds"][location]["chat"] = "all"
-            with open("config.json", "w") as configFile:
+            with open(directory+"config.json", "w") as configFile:
                 json.dump(Config, configFile)
     else:
         if Config["guilds"][location]["chat"] == str(ctx.channel.id):
@@ -333,7 +337,7 @@ async def Setchat(ctx, option):
         else:
             await ctx.send("Set the bot to only respond in this chat :)")
             Config["guilds"][location]["chat"] = str(ctx.channel.id)
-            with open("config.json", "w") as configFile:
+            with open(directory+"config.json", "w") as configFile:
                 json.dump(Config, configFile)
 
 # passtoggle command. Allows a server admin to turn the password command on and off.
@@ -357,7 +361,7 @@ async def passtoggle(ctx):
         await ctx.send("Well, something broke so we enabled the passcommand just in case")
         Setting = True
     Config["guilds"][location]["pass-command"] = Setting
-    with open("config.json", "w") as configFile:
+    with open(directory+"config.json", "w") as configFile:
         json.dump(Config, configFile)
 
 # mostcoins command. Fetches player data and inputs into two parrarel arrays then uses insersertaion sort.
