@@ -267,6 +267,9 @@ async def on_message(message):
 @commands.cooldown(1, 20, commands.BucketType.user)
 async def Pass(ctx, PassLen, PassUni):
     PassComm = get_pass(bot, ctx)
+
+    # Pass boolean variable check
+
     if PassComm == "False":
         embed = discord.Embed(color = Red)
         embed.add_field(name = "Error", value = "This command is disabled, please change your config or contact the server admin.")
