@@ -7,6 +7,8 @@ from decouple import config # to work with .env file
 from discord.ext import commands # command functionality for discord.py
 import discord # main discord API functionality
 from dotenv import load_dotenv # to work with .env file
+import asyncio
+import random
 
 # File imports
 import passwordgen_program as PassGen # Imports password generator source file
@@ -221,6 +223,8 @@ async def on_ready():
 
     logging.info("The bot connected to "+str(len(guildIDs))+" guild(s).")
     logging.info("Bot is up. Time taken to initialize: "+"%s seconds" % (round(time.time() - start_time, 5)))
+
+    #await SendDMs()
 
 # This runs when the bot joins a guild. It checks if the bot was already in the guild and therefore has a config for the guild already set in the json file and if not it will make a new entry.
 
