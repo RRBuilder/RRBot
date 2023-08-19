@@ -2,75 +2,77 @@ import requests
 from main import timed_lru_cache, DateDisplay, LengthProcess, GameReadable, TimeSnip
 from decouple import config
 import time
-import datetime
 import logging
 
 key = config("API_TOKEN")
 
-# Fucntion to request the stats of a player.
+
+# Function to request the stats of a player.
 def StatsRequest(UUID):
     try:
-        #fetches the player stats of a player.
-        Stats = requests.get("https://api.hypixel.net/player?key="+key+"&uuid="+UUID).json()
+        # fetches the player stats of a player.
+        stats = requests.get("https://api.hypixel.net/player?key=" + key + "&uuid=" + UUID)
+        stats_scode = stats.status_code
+        stats = stats.json()
     except:
         logging.warning("Something went wrong talking to the session API!")
         raise Exception("API appears down")
 
-    r = requests.head("https://api.hypixel.net/player?key="+key+"&uuid="+UUID)
-    if r.status_code != 200:
-        logging.warning("The API did not respond with a 200 status code, it gave a "+str(r.status_code))
+    if stats_scode != 200:
+        logging.warning("The API did not respond with a 200 status code, it gave a " + str(stats_scode))
         raise Exception("API appears down")
 
     try:
-        Username = Stats["player"]["displayname"]
+        username = stats["player"]["displayname"]
     except:
-        raise Exception("Username is unknown")
+        raise Exception("username is unknown")
 
     try:
-        Version = Stats["player"]["mcVersionRp"]
+        version = stats["player"]["mcVersionRp"]
     except:
-        Version = "N/A"
+        version = "N/A"
 
     try:
-        LastLogin = Stats["player"]["lastLogin"]
+        lastLogin = stats["player"]["lastLogin"]
     except:
-        LastLogin = 0
+        lastLogin = 0
 
     try:
-        LastLogout = Stats["player"]["lastLogout"]
+        lastLogout = stats["player"]["lastLogout"]
     except:
-        LastLogout = 0
+        lastLogout = 0
 
-    if LastLogout < LastLogin or LastLogout == LastLogin:
-        LastLogout = 0
+    if lastLogout < lastLogin or lastLogout == lastLogin:
+        lastLogout = 0
 
     try:
-        UserLang = Stats["player"]["userLanguage"]
+        userLanguage = stats["player"]["userLanguage"]
     except:
-        UserLang = "N/A"
+        userLanguage = "N/A"
 
     try:
-        LastGame = Stats["player"]["mostRecentGameType"]
+        lastGame = stats["player"]["mostRecentGameType"]
     except:
-        LastGame = "N/A"
+        lastGame = "N/A"
 
-    return Version, LastLogin, LastLogout, UserLang, LastGame, Username
+    return version, lastLogin, lastLogout, userLanguage, lastGame, username
 
-#Main function used to process the player data
+
+# Main function used to process the player data
 @timed_lru_cache(600)
 def MainProcess(UUID):
-    Version, LastLogin, LastLogout, UserLang, LastGame, Username = StatsRequest(UUID)
+    version, lastLogin, lastLogout, userLanguage, lastGame, username = StatsRequest(UUID)
 
-    LastLoginReadable = DateDisplay(LastLogin)
-    LastLogoutReadable = DateDisplay(LastLogout)
+    lastLoginReadable = DateDisplay(lastLogin)
+    lastLogoutReadable = DateDisplay(lastLogout)
 
-    if LastLogout < 0 or LastLogout == 0:
-        Timestamp = int(time.time())
+    if lastLogout < 0 or lastLogout == 0:
+        timestamp = int(time.time())
     else:
-        Timestamp = TimeSnip(LastLogout)
+        timestamp = TimeSnip(lastLogout)
 
-    Length = LengthProcess(LastLogin, LastLogout)
+    length = LengthProcess(lastLogin, lastLogout)
 
-    LastGame = GameReadable(LastGame)
+    lastGame = GameReadable(lastGame)
 
-    return Version, LastLoginReadable, LastLogoutReadable, UserLang, LastGame, Length, Username, Timestamp
+    return version, lastLoginReadable, lastLogoutReadable, userLanguage, lastGame, length, username, timestamp

@@ -6,60 +6,64 @@ import logging
 
 key = config("API_TOKEN")
 
+
 def GameRequest(UUID):
     try:
         # Fetches recent game data from the Hypixel API.
-        game = requests.get("https://api.hypixel.net/recentgames?key="+key+"&uuid="+UUID).json()
+        game = requests.get("https://api.hypixel.net/recentgames?key=" + key + "&uuid=" + UUID)
+        game_scode = game.status_code
+        game = game.json()
     except:
         logging.warning("Something went wrong talking to the recent games API!")
         raise Exception("API appears down")
 
-    r = requests.head("https://api.hypixel.net/recentgames?key="+key+"&uuid="+UUID)
     # Status code check to prevent errors pertaining to not receiving data.
-    if r.status_code != 200:
-        logging.warning("The API did not respond with a 200 status code, it gave a "+str(r.status_code))
+    if game_scode != 200:
+        logging.warning("The API did not respond with a 200 status code, it gave a " + str(game_scode))
         raise Exception("API appears down")
 
-    GameType, Map, TimeEnded, TimeStarted = GameProcess(game)
+    gameType, gameMap, timeEnded, timeStarted = GameProcess(game)
 
-    return GameType, Map, TimeEnded, TimeStarted
+    return gameType, gameMap, timeEnded, timeStarted
+
 
 def GameProcess(game):
-    GameType = []
-    Map = []
-    TimeEnded = []
-    TimeStarted = []
+    gameType = []
+    gameMap = []
+    timeEnded = []
+    timeStarted = []
     if len(game["games"]) == 0:
-        return GameType, Map, TimeEnded, TimeStarted
+        return gameType, gameMap, timeEnded, timeStarted
     else:
         for x in range(len(game["games"])):
-            count = x+1
+            count = x + 1
             if count > 5:
                 break
             else:
                 try:
-                    GameType.append(str(game["games"][x]["gameType"]))
+                    gameType.append(str(game["games"][x]["gameType"]))
                 except:
-                    GameType.append(str("No data"))
+                    gameType.append(str("No data"))
 
                 try:
-                    Map.append(str(game["games"][x]["map"]))
+                    gameMap.append(str(game["games"][x]["gameMap"]))
                 except:
-                    Map.append(str("No data"))
+                    gameMap.append(str("No data"))
 
                 try:
-                    TimeEnded.append(int(game["games"][x]["ended"]))
+                    timeEnded.append(int(game["games"][x]["ended"]))
                 except:
-                    TimeEnded.append(int(0))
+                    timeEnded.append(int(0))
 
                 try:
-                    TimeStarted.append(int(game["games"][x]["date"]))
+                    timeStarted.append(int(game["games"][x]["date"]))
                 except:
-                    TimeStarted.append(int(0))
+                    timeStarted.append(int(0))
 
-        return GameType, Map, TimeEnded, TimeStarted
+        return gameType, gameMap, timeEnded, timeStarted
 
-# main gameslist function. Returns player data
+
+# main games-list function. Returns player data
 @timed_lru_cache(600)
 def GamesList(uuid):
     timeStartedRead = []

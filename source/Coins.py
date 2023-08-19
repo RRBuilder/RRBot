@@ -5,160 +5,166 @@ import datetime
 
 key = config("API_TOKEN")
 
+
 def StatProcess(UUID):
-    TimeNow = str(datetime.datetime.now().strftime("%x %X"))
-    Coins = []
-    Games = ["Arcade", "The Walls", "Mega Walls", "Smash Heroes", "Turbo Cart Racers", "SkyWars", "Paint Ball", "Cops n Crims", "TNT Games", "UHC", "Warlords", "Vampire Z", "Blitz SG", "Crazy Walls", "Arena Brawl", "Quakecraft", "Speed UHC", "SkyClash", "Build Battle", "Duels", "Murder Mystery", "Bedwars"]
+    timeNow = str(datetime.datetime.now().strftime("%x %X"))
+    coinsList = []
+    gamesList = ["Arcade", "The Walls", "Mega Walls", "Smash Heroes", "Turbo Cart Racers", "SkyWars", "Paint Ball",
+                 "Cops n Crims", "TNT gamesList", "UHC", "Warlords", "Vampire Z", "Blitz SG", "Crazy Walls",
+                 "Arena Brawl", "Quakecraft", "Speed UHC", "SkyClash", "Build Battle", "Duels", "Murder Mystery",
+                 "Bedwars"]
 
     try:
-        Stats = requests.get("https://api.hypixel.net/player?key="+key+"&uuid="+UUID).json()
+        stats = requests.get("https://api.hypixel.net/player?key=" + key + "&uuid=" + UUID)
+        stats_scode = stats.status_code
+        stats = stats.json()
     except:
         print("Something went wrong talking to the session API!")
         raise Exception("API appears down")
 
-    r = requests.head("https://api.hypixel.net/player?key="+key+"&uuid="+UUID)
-    if r.status_code != 200:
-        print(TimeNow+" The API did not respond with a 200 status code, it gave a "+str(r.status_code))
+    if stats_scode != 200:
+        print(timeNow + " The API did not respond with a 200 status code, it gave a " + str(stats_scode))
         raise Exception("API appears down")
 
     try:
-        Username = Stats["player"]["displayname"]
+        username = stats["player"]["displayname"]
     except:
-        raise Exception("Username is unknown")
-
+        raise Exception("username is unknown")
 
     try:
-        Coins.append(int(Stats["player"]["stats"]["Arcade"]["coins"]))
+        coinsList.append(int(stats["player"]["stats"]["Arcade"]["coinsList"]))
     except:
-        Coins.append(0)
+        coinsList.append(0)
 
     try:
-        Coins.append(int(Stats["player"]["stats"]["Walls"]["coins"]))
+        coinsList.append(int(stats["player"]["stats"]["Walls"]["coinsList"]))
     except:
-        Coins.append(0)
+        coinsList.append(0)
 
     try:
-        Coins.append(int(Stats["player"]["stats"]["Walls3"]["coins"]))
+        coinsList.append(int(stats["player"]["stats"]["Walls3"]["coinsList"]))
     except:
-        Coins.append(0)
+        coinsList.append(0)
 
     try:
-        Coins.append(int(Stats["player"]["stats"]["SuperSmash"]["coins"]))
+        coinsList.append(int(stats["player"]["stats"]["SuperSmash"]["coinsList"]))
     except:
-        Coins.append(0)
+        coinsList.append(0)
 
     try:
-        Coins.append(int(Stats["player"]["stats"]["GingerBread"]["coins"]))
+        coinsList.append(int(stats["player"]["stats"]["GingerBread"]["coinsList"]))
     except:
-        Coins.append(0)
+        coinsList.append(0)
 
     try:
-        Coins.append(int(Stats["player"]["stats"]["SkyWars"]["coins"]))
+        coinsList.append(int(stats["player"]["stats"]["SkyWars"]["coinsList"]))
     except:
-        Coins.append(0)
+        coinsList.append(0)
 
     try:
-        Coins.append(int(Stats["player"]["stats"]["Paintball"]["coins"]))
+        coinsList.append(int(stats["player"]["stats"]["Paintball"]["coinsList"]))
     except:
-        Coins.append(0)
+        coinsList.append(0)
 
     try:
-        Coins.append(int(Stats["player"]["stats"]["MCGO"]["coins"]))
+        coinsList.append(int(stats["player"]["stats"]["MCGO"]["coinsList"]))
     except:
-        Coins.append(0)
+        coinsList.append(0)
 
     try:
-        Coins.append(int(Stats["player"]["stats"]["TNTGames"]["coins"]))
+        coinsList.append(int(stats["player"]["stats"]["TNTGames"]["coinsList"]))
     except:
-        Coins.append(0)
+        coinsList.append(0)
 
     try:
-        Coins.append(int(Stats["player"]["stats"]["UHC"]["coins"]))
+        coinsList.append(int(stats["player"]["stats"]["UHC"]["coinsList"]))
     except:
-        Coins.append(0)
+        coinsList.append(0)
 
     try:
-        Coins.append(int(Stats["player"]["stats"]["Battleground"]["coins"]))
+        coinsList.append(int(stats["player"]["stats"]["Battleground"]["coinsList"]))
     except:
-        Coins.append(0)
+        coinsList.append(0)
 
     try:
-        Coins.append(int(Stats["player"]["stats"]["VampireZ"]["coins"]))
+        coinsList.append(int(stats["player"]["stats"]["VampireZ"]["coinsList"]))
     except:
-        Coins.append(0)
+        coinsList.append(0)
 
     try:
-        Coins.append(int(Stats["player"]["stats"]["HungerGames"]["coins"]))
+        coinsList.append(int(stats["player"]["stats"]["HungerGames"]["coinsList"]))
     except:
-        Coins.append(0)
+        coinsList.append(0)
 
     try:
-        Coins.append(int(Stats["player"]["stats"]["TrueCombat"]["coins"]))
+        coinsList.append(int(stats["player"]["stats"]["TrueCombat"]["coinsList"]))
     except:
-        Coins.append(0)
+        coinsList.append(0)
 
     try:
-        Coins.append(int(Stats["player"]["stats"]["Arena"]["coins"]))
+        coinsList.append(int(stats["player"]["stats"]["Arena"]["coinsList"]))
     except:
-        Coins.append(0)
+        coinsList.append(0)
 
     try:
-        Coins.append(int(Stats["player"]["stats"]["Quake"]["coins"]))
+        coinsList.append(int(stats["player"]["stats"]["Quake"]["coinsList"]))
     except:
-        Coins.append(0)
+        coinsList.append(0)
 
     try:
-        Coins.append(int(Stats["player"]["stats"]["SpeedUHC"]["coins"]))
+        coinsList.append(int(stats["player"]["stats"]["SpeedUHC"]["coinsList"]))
     except:
-        Coins.append(0)
+        coinsList.append(0)
 
     try:
-        Coins.append(int(Stats["player"]["stats"]["SkyClash"]["coins"]))
+        coinsList.append(int(stats["player"]["stats"]["SkyClash"]["coinsList"]))
     except:
-        Coins.append(0)
+        coinsList.append(0)
 
     try:
-        Coins.append(int(Stats["player"]["stats"]["BuildBattle"]["coins"]))
+        coinsList.append(int(stats["player"]["stats"]["BuildBattle"]["coinsList"]))
     except:
-        Coins.append(0)
+        coinsList.append(0)
 
     try:
-        Coins.append(int(Stats["player"]["stats"]["Duels"]["coins"]))
+        coinsList.append(int(stats["player"]["stats"]["Duels"]["coinsList"]))
     except:
-        Coins.append(0)
+        coinsList.append(0)
 
     try:
-        Coins.append(int(Stats["player"]["stats"]["MurderMystery"]["coins"]))
+        coinsList.append(int(stats["player"]["stats"]["MurderMystery"]["coinsList"]))
     except:
-        Coins.append(0)
+        coinsList.append(0)
 
     try:
-        Coins.append(int(Stats["player"]["stats"]["Bedwars"]["coins"]))
+        coinsList.append(int(stats["player"]["stats"]["Bedwars"]["coinsList"]))
     except:
-        Coins.append(0)
+        coinsList.append(0)
 
-    return Coins, Games, Username
+    return coinsList, gamesList, username
+
 
 @timed_lru_cache(600)
 def GetMostCoins(UUID):
-    CoinsList, GamesList, Username = StatProcess(UUID)
+    coinsList, gamesList, username = StatProcess(UUID)
 
-    CoinsList, Gameslist = InsertionSort(CoinsList, GamesList)
+    coinsListSorted, gamesListSorted = InsertionSort(coinsList, gamesList)
 
-    MostCoins = CoinsList[len(CoinsList)-1]
-    MostCoinsGame = GamesList[len(CoinsList)-1]
-    return MostCoins, MostCoinsGame, Username
+    mostCoins = coinsListSorted[len(coinsListSorted) - 1]
+    mostCoinsGame = gamesList[len(coinsListSorted) - 1]
+    return mostCoins, mostCoinsGame, username
 
-def InsertionSort(CoinsList, GamesList):
-    for i in range(1, len(CoinsList)):
-        valueCoins = CoinsList[i]
-        valueGames = GamesList[i]
-        index = i-1
-        while index >= 0 and valueCoins < CoinsList[index]:
-            CoinsList[index+1] = CoinsList[index]
-            GamesList[index+1] = GamesList[index]
+
+def InsertionSort(coinsListSorted, gamesList):
+    for i in range(1, len(coinsListSorted)):
+        valueCoins = coinsListSorted[i]
+        valueGames = gamesList[i]
+        index = i - 1
+        while index >= 0 and valueCoins < coinsListSorted[index]:
+            coinsListSorted[index + 1] = coinsListSorted[index]
+            gamesList[index + 1] = gamesList[index]
             index -= 1
-        CoinsList[index+1] = valueCoins
-        GamesList[index+1] = valueGames
+        coinsListSorted[index + 1] = valueCoins
+        gamesList[index + 1] = valueGames
 
-    return CoinsList, GamesList
+    return coinsListSorted, gamesList

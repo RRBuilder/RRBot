@@ -2,12 +2,12 @@ import requests
 from functools import lru_cache, wraps
 from datetime import datetime, timedelta
 
+
 # Tiems LRU cache wrapped function.
 
 
 def timed_lru_cache(seconds: int, maxsize: int = 128):
     def wrapper_cache(func):
-
         func = lru_cache(maxsize=maxsize)(func)
         func.lifetime = timedelta(seconds=seconds)
         func.expiration = datetime.utcnow() + func.lifetime
@@ -23,68 +23,79 @@ def timed_lru_cache(seconds: int, maxsize: int = 128):
         return wrapped_func
 
     return wrapper_cache
+
+
 # Taken from stack overflow.
 
-# Function to get rid of miliseconds
+# Function to get rid of milliseconds
 
 
-def TimeSnip(timewhen):
-    timewhen = int(str(timewhen)[0:-3])
-    return timewhen
+def TimeSnip(timeWhen):
+    timeWhen = int(str(timeWhen)[0:-3])
+    return timeWhen
+
 
 # Function to fetch the UUID of the passed through user.
 
 
-@lru_cache(maxsize = 250)
+@lru_cache(maxsize=250)
 def UUIDFetch(username):
     try:
-        uuid = requests.get("https://api.mojang.com/users/profiles/minecraft/"+username).json()['id']
+        uuid = requests.get("https://api.mojang.com/users/profiles/minecraft/" + username)
+        uuid_scode = uuid.status_code
+        uuid = uuid.json()['id']
     except:
         raise Exception("Username is invalid")
 
-    r = requests.head("https://api.mojang.com/users/profiles/minecraft/"+username)
-    if r.status_code != 200:
-        raise Exception("Username is invalid")
+    if uuid_scode != 200:
+        if uuid_scode == 401 | uuid_scode == 405:
+            pass
+        else:
+            raise Exception("Username is invalid")
 
     return uuid
 
+
 # Generates a date.
-def DateDisplay(timevar):
-    if timevar == 0:
-        DateData = "Player online or data not found."
+def DateDisplay(timeVar):
+    if timeVar == 0:
+        dateData = "Player online or data not found."
     else:
-        DateData = datetime.fromtimestamp(int(timevar/1000))
-    return DateData
+        dateData = datetime.fromtimestamp(int(timeVar / 1000))
+    return dateData
 
-# Converts two milisecond values to lenght between the two in a readable format.
-def LengthProcess(Start, End):
-    Length = End - Start
-    if Length < 0 or Length == 0:
-        TimeData = "Player online/Game ongoing."
+
+# Converts two millisecond values to length between the two in a readable format.
+def LengthProcess(startTime, endTime):
+    timeLength = endTime - startTime
+    if timeLength < 0 or timeLength == 0:
+        timeData = "Player online/Game ongoing."
     else:
-        Milis = int(Length)
+        millis = int(timeLength)
 
-        Seconds = (Milis/1000)%60
-        Seconds = int(Seconds)
+        seconds = (millis / 1000) % 60
+        seconds = int(seconds)
 
-        Minutes = (Milis/(1000*60))%60
-        Minutes = int(Minutes)
+        minutes = (millis / (1000 * 60)) % 60
+        minutes = int(minutes)
 
-        Hours = (Milis/(1000*60*60))%24
-        Hours = int(Hours)
+        hours = (millis / (1000 * 60 * 60)) % 24
+        hours = int(hours)
 
-        if Hours == 0:
-            TimeData = "%dm:%ds" % (Minutes, Seconds)
+        if hours == 0:
+            timeData = "%dm:%ds" % (minutes, seconds)
         else:
-            TimeData = "%dh:%dm:%ds" % (Hours, Minutes, Seconds)
-    return TimeData
+            timeData = "%dh:%dm:%ds" % (hours, minutes, seconds)
+    return timeData
+
 
 # Converts games from the API to more readable forms.
 def GameReadable(gameType):
+    game = ""
     if gameType == "BEDWARS":
         game = "Bedwars"
         pass
-    elif gameType == "UHC" or gameType == "No data"  or gameType == "N/A":
+    elif gameType == "UHC" or gameType == "No data" or gameType == "N/A":
         game = gameType
         pass
     elif gameType == "SKYWARS":
@@ -165,7 +176,7 @@ def GameReadable(gameType):
     elif gameType == "QUAKECRAFT":
         game = "Quake"
         pass
-    #Legacy games. - Will likely be removed soon.
+    # Legacy games. - Will likely be removed soon.
     elif gameType == "SKYCLASH":
         game = "Skyclash"
         pass
