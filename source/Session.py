@@ -11,7 +11,7 @@ key = config("API_TOKEN")
 def StatsRequest(UUID):
     try:
         # fetches the player stats of a player.
-        stats = requests.get("https://api.hypixel.net/player?key=" + key + "&uuid=" + UUID)
+        stats = requests.get("https://api.hypixel.net/player?uuid=" + UUID, headers={"API-Key": key})
         stats_scode = stats.status_code
         stats = stats.json()
     except:

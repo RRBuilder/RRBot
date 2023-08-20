@@ -10,7 +10,7 @@ key = config("API_TOKEN")
 def GameRequest(UUID):
     try:
         # Fetches recent game data from the Hypixel API.
-        game = requests.get("https://api.hypixel.net/recentgames?key=" + key + "&uuid=" + UUID)
+        game = requests.get("https://api.hypixel.net/recentgames?uuid=" + UUID, headers={"API-Key": key})
         game_scode = game.status_code
         game = game.json()
     except:

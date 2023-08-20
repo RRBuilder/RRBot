@@ -15,7 +15,7 @@ def StatProcess(UUID):
                  "Bedwars"]
 
     try:
-        stats = requests.get("https://api.hypixel.net/player?key=" + key + "&uuid=" + UUID)
+        stats = requests.get("https://api.hypixel.net/player?uuid=" + UUID, headers={"API-Key": key})
         stats_scode = stats.status_code
         stats = stats.json()
     except:
