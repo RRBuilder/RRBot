@@ -10,7 +10,7 @@ def StatProcess(UUID):
     timeNow = str(datetime.datetime.now().strftime("%x %X"))
     coinsList = []
     gamesList = ["Arcade", "The Walls", "Mega Walls", "Smash Heroes", "Turbo Cart Racers", "SkyWars", "Paint Ball",
-                 "Cops n Crims", "TNT gamesList", "UHC", "Warlords", "Vampire Z", "Blitz SG", "Crazy Walls",
+                 "Cops n Crims", "TNT games", "UHC", "Warlords", "Vampire Z", "Blitz SG", "Crazy Walls",
                  "Arena Brawl", "Quakecraft", "Speed UHC", "SkyClash", "Build Battle", "Duels", "Murder Mystery",
                  "Bedwars"]
 
@@ -32,112 +32,112 @@ def StatProcess(UUID):
         raise Exception("username is unknown")
 
     try:
-        coinsList.append(int(stats["player"]["stats"]["Arcade"]["coinsList"]))
+        coinsList.append(int(stats["player"]["stats"]["Arcade"]["coins"]))
     except:
         coinsList.append(0)
 
     try:
-        coinsList.append(int(stats["player"]["stats"]["Walls"]["coinsList"]))
+        coinsList.append(int(stats["player"]["stats"]["Walls"]["coins"]))
     except:
         coinsList.append(0)
 
     try:
-        coinsList.append(int(stats["player"]["stats"]["Walls3"]["coinsList"]))
+        coinsList.append(int(stats["player"]["stats"]["Walls3"]["coins"]))
     except:
         coinsList.append(0)
 
     try:
-        coinsList.append(int(stats["player"]["stats"]["SuperSmash"]["coinsList"]))
+        coinsList.append(int(stats["player"]["stats"]["SuperSmash"]["coins"]))
     except:
         coinsList.append(0)
 
     try:
-        coinsList.append(int(stats["player"]["stats"]["GingerBread"]["coinsList"]))
+        coinsList.append(int(stats["player"]["stats"]["GingerBread"]["coins"]))
     except:
         coinsList.append(0)
 
     try:
-        coinsList.append(int(stats["player"]["stats"]["SkyWars"]["coinsList"]))
+        coinsList.append(int(stats["player"]["stats"]["SkyWars"]["coins"]))
     except:
         coinsList.append(0)
 
     try:
-        coinsList.append(int(stats["player"]["stats"]["Paintball"]["coinsList"]))
+        coinsList.append(int(stats["player"]["stats"]["Paintball"]["coins"]))
     except:
         coinsList.append(0)
 
     try:
-        coinsList.append(int(stats["player"]["stats"]["MCGO"]["coinsList"]))
+        coinsList.append(int(stats["player"]["stats"]["MCGO"]["coins"]))
     except:
         coinsList.append(0)
 
     try:
-        coinsList.append(int(stats["player"]["stats"]["TNTGames"]["coinsList"]))
+        coinsList.append(int(stats["player"]["stats"]["TNTGames"]["coins"]))
     except:
         coinsList.append(0)
 
     try:
-        coinsList.append(int(stats["player"]["stats"]["UHC"]["coinsList"]))
+        coinsList.append(int(stats["player"]["stats"]["UHC"]["coins"]))
     except:
         coinsList.append(0)
 
     try:
-        coinsList.append(int(stats["player"]["stats"]["Battleground"]["coinsList"]))
+        coinsList.append(int(stats["player"]["stats"]["Battleground"]["coins"]))
     except:
         coinsList.append(0)
 
     try:
-        coinsList.append(int(stats["player"]["stats"]["VampireZ"]["coinsList"]))
+        coinsList.append(int(stats["player"]["stats"]["VampireZ"]["coins"]))
     except:
         coinsList.append(0)
 
     try:
-        coinsList.append(int(stats["player"]["stats"]["HungerGames"]["coinsList"]))
+        coinsList.append(int(stats["player"]["stats"]["HungerGames"]["coins"]))
     except:
         coinsList.append(0)
 
     try:
-        coinsList.append(int(stats["player"]["stats"]["TrueCombat"]["coinsList"]))
+        coinsList.append(int(stats["player"]["stats"]["TrueCombat"]["coins"]))
     except:
         coinsList.append(0)
 
     try:
-        coinsList.append(int(stats["player"]["stats"]["Arena"]["coinsList"]))
+        coinsList.append(int(stats["player"]["stats"]["Arena"]["coins"]))
     except:
         coinsList.append(0)
 
     try:
-        coinsList.append(int(stats["player"]["stats"]["Quake"]["coinsList"]))
+        coinsList.append(int(stats["player"]["stats"]["Quake"]["coins"]))
     except:
         coinsList.append(0)
 
     try:
-        coinsList.append(int(stats["player"]["stats"]["SpeedUHC"]["coinsList"]))
+        coinsList.append(int(stats["player"]["stats"]["SpeedUHC"]["coins"]))
     except:
         coinsList.append(0)
 
     try:
-        coinsList.append(int(stats["player"]["stats"]["SkyClash"]["coinsList"]))
+        coinsList.append(int(stats["player"]["stats"]["SkyClash"]["coins"]))
     except:
         coinsList.append(0)
 
     try:
-        coinsList.append(int(stats["player"]["stats"]["BuildBattle"]["coinsList"]))
+        coinsList.append(int(stats["player"]["stats"]["BuildBattle"]["coins"]))
     except:
         coinsList.append(0)
 
     try:
-        coinsList.append(int(stats["player"]["stats"]["Duels"]["coinsList"]))
+        coinsList.append(int(stats["player"]["stats"]["Duels"]["coins"]))
     except:
         coinsList.append(0)
 
     try:
-        coinsList.append(int(stats["player"]["stats"]["MurderMystery"]["coinsList"]))
+        coinsList.append(int(stats["player"]["stats"]["MurderMystery"]["coins"]))
     except:
         coinsList.append(0)
 
     try:
-        coinsList.append(int(stats["player"]["stats"]["Bedwars"]["coinsList"]))
+        coinsList.append(int(stats["player"]["stats"]["Bedwars"]["coins"]))
     except:
         coinsList.append(0)
 

@@ -119,7 +119,7 @@ async def on_command_error(ctx, error):
         # start of error string, is constant with all exceptions.
         start = "Command raised an exception: "
 
-        # Error fires when the $pass command is passed a integer lower than 12
+        # Error fires when the $pass command is passed an integer lower than 12
         if str(error) == start + "Exception: Password too small":
             embed = discord.Embed(color=red)
             embed.add_field(name="Error",
@@ -141,7 +141,7 @@ async def on_command_error(ctx, error):
 
         # Error fires when a command handling a Minecraft usernames is passed a string that is longer than 16 (MC 
         # names cannot exceed 16 characters, no point checking Mojangs API for profile if the lengh > 16)
-        elif str(error) == start + "Exception: username too long":
+        elif str(error) == start + "Exception: Username too long":
             embed = discord.Embed(color=red)
             embed.add_field(name="Error", value="Please enter a username with a maximum lenght of 16.")
             await ctx.send(embed=embed)
@@ -153,14 +153,14 @@ async def on_command_error(ctx, error):
             embed.add_field(name="Error", value="Cannot send messages to this user!")
             await ctx.send(embed=embed)
 
-        # Error fires when any command detects a API outage/no response from the Hypixel API
+        # Error fires when any command detects an API outage/no response from the Hypixel API
         elif str(error) == start + "Exception: API appears down":
             embed = discord.Embed(color=red)
             embed.add_field(name="Error", value="API appears to be down")
             await ctx.send(embed=embed)
 
         # Error fires when the Hypixel API returns a malformed response missing key information
-        elif str(error) == start + "Exception: username is unknown":
+        elif str(error) == start + "Exception: Username is unknown":
             embed = discord.Embed(color=yellow)
             embed.add_field(name="Alert!",
                             value="This username returns a mainly empty file. This is likely one of those usernames that would return no name on plancke and is a general pain to work with. So it is skipped.")
@@ -244,13 +244,13 @@ async def on_ready():
 @bot.event
 async def on_guild_join(guild):
     logging.info("Bot has joined a guild")
-    InConfig = False
+    inConfig = False
     for x in range(len(config["guilds"])):
-        if int(config["guilds"][x]["guildID"]) == int(guild.id) and InConfig != True:
+        if int(config["guilds"][x]["guildID"]) == int(guild.id) and inConfig != True:
             print(
                 "Bot joined a guild, however a config is already setup for " + guild.name + ". Skipping default config setting")
-            InConfig = True
-    if InConfig != True:
+            inConfig = True
+    if not inConfig:
         config["guilds"].append({"guildID": str(guild.id), "prefix": "$", "pass-command": True, "chat": "all"})
         print("Bot joined a new server, set default config for " + guild.name)
         with open(directory + "config.json", "w") as configFile:
