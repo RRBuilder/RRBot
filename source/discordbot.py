@@ -130,7 +130,7 @@ async def on_command_error(ctx, error):
         elif str(error) == start + "Exception: Password too big":
             embed = discord.Embed(color=red)
             embed.add_field(name="Error",
-                            value="That password is too long! Please ensure you enter a lenght that is smaller than 256!")
+                            value="That password is too long! Please ensure you enter a length that is smaller than 256!")
             await ctx.send(embed=embed)
 
         # Error fires when the $pass command is passed an integer that isn't either 0 or 1
@@ -140,10 +140,10 @@ async def on_command_error(ctx, error):
             await ctx.send(embed=embed)
 
         # Error fires when a command handling a Minecraft usernames is passed a string that is longer than 16 (MC 
-        # names cannot exceed 16 characters, no point checking Mojangs API for profile if the lengh > 16)
+        # names cannot exceed 16 characters, no point checking Mojangs API for profile if the length > 16)
         elif str(error) == start + "Exception: Username too long":
             embed = discord.Embed(color=red)
-            embed.add_field(name="Error", value="Please enter a username with a maximum lenght of 16.")
+            embed.add_field(name="Error", value="Please enter a username with a maximum length of 16.")
             await ctx.send(embed=embed)
 
         # Error fires when Discord API shows that the bot is either Blocked or has DMs disabled, so when the bot 
@@ -167,7 +167,7 @@ async def on_command_error(ctx, error):
             await ctx.send(embed=embed)
 
         # Error fires when the Mojang API cannot find the MC profile name and hence cannot return a UUID
-        elif str(error) == start + "Exception: username is invalid":
+        elif str(error) == start + "Exception: Username is invalid":
             embed = discord.Embed(color=red)
             embed.add_field(name="Error", value="Sorry, but that username is not valid! Make sure you re-enter it")
             await ctx.send(embed=embed)
